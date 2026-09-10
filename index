@@ -1,0 +1,2197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sports Unplugged India | Live Discussion Suite V5.0</title>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Fira+Sans:wght@400;700&family=Inter:wght@400;700;800&family=Lato:wght@400;700;900&family=Merriweather:wght@400;700;900&family=Montserrat:wght@400;600;700;800&family=Nunito:wght@400;700;800&family=Open+Sans:wght@400;700;800&family=Oswald:wght@400;700&family=PT+Sans:wght@400;700&family=Playfair+Display:wght@400;700;800&family=Poppins:wght@400;700;800&family=Raleway:wght@400;700;800&family=Roboto:wght@400;700;900&family=Rubik:wght@400;700;800&family=Teko:wght@400;600;700&family=Ubuntu:wght@400;700&family=Work+Sans:wght@400;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.pubnub.com/sdk/javascript/pubnub.7.2.2.min.js"></script>
+  <style>
+    :root {
+      --target-scale: 1; --ff-tgt-lbl: 'Montserrat', sans-serif; --f-tgt-label: 13px; --ff-tgt-val: 'Teko', sans-serif; --f-tgt-val: 30px;
+      --tk-h: 40px; --ff-tk: 'Montserrat', sans-serif; --tk-f: 22px; --tk-op: 0.9; --tk-txt-c: #ffffff;
+      
+      --ag-scale: 1; --ff-ag: 'Montserrat', sans-serif;
+      --ag-r1-f: 24px; --ag-r1-c: #ffffff; --ag-r1-bg: #111;
+      --ag-r2-f: 18px; --ag-r2-c: #ffffff; --ag-r2-bg: #111; --ag-b2-c: #111; --ag-b2-bg: #ffd700;
+      --ag-r3-f: 16px; --ag-r3-c: #aaaaaa; --ag-r3-bg: #111; --ag-b3-c: #fff; --ag-b3-bg: #3b82f6;
+
+      --ff-l3: 'Montserrat', sans-serif;
+      --l3-f-name: 26px; --l3-f-title: 14px;
+      
+      --br-w: 8px; --br-op: 1; --br-style: linear-gradient(135deg, #d31122 0%, #f6b200 100%);
+      
+      --lss-scale: 1; --lss-x: 50%; --lss-y: 20%; --lss-bg: linear-gradient(90deg, #ff0000 0%, #cc0000 100%); --lss-txt: #ffffff;
+      
+      --agl-scale: 1; --agl-x: 80%; --agl-y: 50%; --agl-bg: linear-gradient(135deg, #111 0%, #222 100%); --agl-txt: #ffffff;
+      
+      /* Custom List Variables */
+      --clp-scale: 1; --clp-x: 20%; --clp-y: 50%; --clp-bg: linear-gradient(135deg, #111 0%, #222 100%); --clp-txt: #ffffff;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+    html, body { background-color: transparent !important; background-image: none !important; font-family: 'Montserrat', sans-serif; overflow: hidden; width: 100vw; height: 100vh; position: relative; }
+    img[src=""], img:not([src]) { display: none !important; }
+    .font-dropdown, .font-select { background: #222; color: #ccc; border: 1px solid #555; border-radius: 4px; padding: 2px 4px; width: 90px; font-family: 'Montserrat', sans-serif; cursor: pointer; outline: none; font-size: 11px; font-weight: bold; }
+
+    /* BORDERS */
+    .cam-frame { position: absolute; display: none; aspect-ratio: 16/9; pointer-events: none; border: var(--br-w) solid; border-image: var(--br-style) 1; opacity: var(--br-op); z-index: 1; box-shadow: inset 0 0 20px rgba(0,0,0,0.5), 0 0 20px rgba(0,0,0,0.5); }
+    #global-frame { left: 0; top: 0; width: 100vw; height: 100vh; z-index: 99; border-width: var(--br-w); }
+
+    /* WIDGETS */
+    .sub-count-wrapper { position: absolute; left: 20px; top: 20px; height: 100px; width: 380px; background: rgba(12, 14, 18, 0.95); border-radius: 8px; border: 2px solid rgba(255, 255, 255, 0.18); box-shadow: 0 8px 24px rgba(0,0,0,0.85); overflow: hidden; z-index: 5; }
+    .sub-count-wrapper iframe { width: 100%; height: 100%; border: none; overflow: hidden; }
+    .targets-wrapper { position: absolute; right: 20px; top: 20px; height: 100px; border-radius: 8px; border: 2px solid rgba(255, 255, 255, 0.25); z-index: 5; box-shadow: 0 8px 24px rgba(0,0,0,0.85); display: flex; flex-direction: column; justify-content: center; padding: 0 24px; gap: 12px; min-width: 260px; transform: scale(var(--target-scale)); transform-origin: top right; transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
+    .target-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 4px; }
+    .target-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .target-label { color: #e2e8f0; font-family: var(--ff-tgt-lbl); font-size: var(--f-tgt-label); letter-spacing: 1.5px; text-transform: uppercase; font-weight: 800; }
+    .target-value { color: #ffd700; font-family: var(--ff-tgt-val); font-size: var(--f-tgt-val); line-height: 0.8; font-weight: 700; text-shadow: 1px 1px 3px rgba(0,0,0,0.9); }
+
+    .ticker-wrapper { position: absolute; bottom: 0; left: 0; width: 100vw; height: var(--tk-h); display: flex; align-items: center; overflow: hidden; z-index: 50; box-shadow: 0 -4px 12px rgba(0,0,0,0.6); transition: height 0.3s; }
+    .ticker-bg { position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: var(--tk-op); z-index: 1; transition: opacity 0.2s, background 0.3s; }
+    .ticker-content { position: relative; z-index: 2; width: 100%; }
+    .ticker-text { color: var(--tk-txt-c); font-family: var(--ff-tk); font-size: var(--tk-f); font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; text-shadow: 1px 1px 3px rgba(0,0,0,0.9); white-space: nowrap; }
+    .ticker-text.scrolling { display: inline-block; padding-left: 100vw; animation: ticker-scroll 25s linear infinite; }
+    .ticker-text.static { display: block; width: 100%; text-align: center; padding-left: 0; animation: none; }
+    @keyframes ticker-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+    @keyframes pulse { from { opacity: 0.3; } to { opacity: 1; } }
+
+    /* AGENDA TRACKER (3 ROWS) */
+    .agenda-wrapper { position: absolute; top: 20px; left: 50%; transform: translateX(-50%) scale(var(--ag-scale)); transform-origin: top center; z-index: 10; display: flex; flex-direction: column; align-items: stretch; border-radius: 8px; border: 2px solid rgba(255, 255, 255, 0.25); box-shadow: 0 8px 24px rgba(0,0,0,0.85); overflow: hidden; min-width: 500px; }
+    .ag-row { display: flex; align-items: center; font-family: var(--ff-ag); transition: background 0.3s, color 0.3s, font-size 0.2s; }
+    #ag-row-1 { padding: 8px 20px; justify-content: center; font-size: var(--ag-r1-f); color: var(--ag-r1-c); background: var(--ag-r1-bg); font-weight: 900; text-transform: uppercase; letter-spacing: 1.5px; text-shadow: 1px 1px 3px rgba(0,0,0,0.9); }
+    #ag-row-2 { background: var(--ag-r2-bg); }
+    #ag-row-3 { background: var(--ag-r3-bg); }
+    .ag-badge { font-weight: 900; text-transform: uppercase; letter-spacing: 1px; padding: 6px 14px; white-space: nowrap; }
+    #ag-badge-2 { background: var(--ag-b2-bg); color: var(--ag-b2-c); font-size: calc(var(--ag-r2-f) - 3px); }
+    #ag-badge-3 { background: var(--ag-b3-bg); color: var(--ag-b3-c); font-size: calc(var(--ag-r3-f) - 3px); }
+    .ag-text { font-weight: 700; padding: 6px 16px; white-space: nowrap; text-transform: uppercase; width: 100%; }
+    #ag-text-2 { font-size: var(--ag-r2-f); color: var(--ag-r2-c); }
+    #ag-text-3 { font-size: var(--ag-r3-f); color: var(--ag-r3-c); }
+
+    /* MULTIPLE DRAGGABLE NAMEPLATES */
+    .nameplate-wrapper { position: absolute; transform: translate(-50%, -50%); display: flex; flex-direction: column; z-index: 20; border-radius: 8px; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.25); box-shadow: 0 8px 24px rgba(0,0,0,0.85); cursor: grab; }
+    .nameplate-wrapper:active { cursor: grabbing; }
+    .np-top { padding: 10px 24px; font-family: var(--ff-l3); font-size: var(--l3-f-name); font-weight: 900; text-transform: uppercase; letter-spacing: 1.5px; text-shadow: 1px 1px 4px rgba(0,0,0,0.9); white-space: nowrap; }
+    .np-bottom { padding: 6px 24px; font-family: var(--ff-l3); font-size: var(--l3-f-title); font-weight: 700; text-transform: uppercase; letter-spacing: 2px; white-space: nowrap; }
+
+    /* VERTICAL AGENDA LIST PANEL (WITH AUTO SORTING & INDICATORS) */
+    .agenda-list-wrapper { position: absolute; left: var(--agl-x); top: var(--agl-y); transform: translate(-50%, -50%) scale(var(--agl-scale)); z-index: 15; display: flex; flex-direction: column; border-radius: 8px; border: 2px solid rgba(255, 255, 255, 0.25); box-shadow: 0 8px 24px rgba(0,0,0,0.85); overflow: hidden; min-width: 320px; cursor: grab; background: var(--agl-bg); }
+    .agenda-list-wrapper:active { cursor: grabbing; }
+    .agl-header { background: rgba(0,0,0,0.6); color: var(--agl-txt); padding: 12px; font-family: var(--ff-ag); font-size: 20px; font-weight: 900; text-align: center; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 2px solid rgba(255,255,255,0.2); }
+    .agl-body { display: flex; flex-direction: column; padding: 12px; gap: 8px; }
+    .agl-item { color: var(--agl-txt); font-family: var(--ff-ag); font-size: 16px; font-weight: 700; text-transform: uppercase; padding: 8px 12px; border-left: 4px solid transparent; background: rgba(0,0,0,0.2); transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); border-radius: 0 4px 4px 0; display: flex; align-items: center; gap: 8px; }
+    .agl-item.status-now { border-left-color: #ffd700; background: rgba(255, 215, 0, 0.2); color: #ffd700; transform: scale(1.02); box-shadow: 0 4px 10px rgba(0,0,0,0.3); text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 2px 2px 4px rgba(0,0,0,0.8); }
+    .agl-item.status-next { border-left-color: #3b82f6; background: rgba(59, 130, 246, 0.2); color: #60a5fa; text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 2px 2px 4px rgba(0,0,0,0.8); }
+    .agl-item.status-completed { border-left-color: #10b981; opacity: 0.55; }
+    .ag-live-bulb { width: 10px; height: 10px; border-radius: 50%; background: #ef4444; box-shadow: 0 0 8px #ef4444; animation: pulse 1s infinite alternate; flex-shrink: 0; }
+    .ag-up-next { font-size: 10px; background: #3b82f6; color: #fff; padding: 2px 6px; border-radius: 4px; margin-left: auto; animation: pulse 1s infinite alternate; font-weight: 900; letter-spacing: 1px; flex-shrink: 0; text-shadow: none; box-shadow: 0 0 5px rgba(0,0,0,0.5); }
+    .ag-completed { color: #10b981; font-weight: 900; margin-left: auto; font-size: 16px; flex-shrink: 0; text-shadow: none; }
+
+    /* CUSTOM VERTICAL LIST PANEL */
+    .custom-list-wrapper { position: absolute; left: var(--clp-x); top: var(--clp-y); transform: translate(-50%, -50%) scale(var(--clp-scale)); z-index: 16; display: flex; flex-direction: column; border-radius: 8px; border: 2px solid rgba(255, 255, 255, 0.25); box-shadow: 0 8px 24px rgba(0,0,0,0.85); overflow: hidden; min-width: 300px; cursor: grab; background: var(--clp-bg); }
+    .custom-list-wrapper:active { cursor: grabbing; }
+    .clp-header { background: rgba(0,0,0,0.6); color: var(--clp-txt); padding: 12px; font-family: var(--ff-ag); font-size: 20px; font-weight: 900; text-align: center; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 2px solid rgba(255,255,255,0.2); }
+    .clp-body { display: flex; flex-direction: column; padding: 12px; gap: 8px; }
+    .clp-item { color: var(--clp-txt); font-family: var(--ff-ag); font-size: 16px; font-weight: 700; text-transform: uppercase; padding: 8px 12px; border-left: 4px solid transparent; background: rgba(0,0,0,0.2); transition: all 0.2s; border-radius: 0 4px 4px 0; }
+    .clp-item.highlighted { transform: scale(1.02); box-shadow: 0 4px 10px rgba(0,0,0,0.3); text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 2px 2px 4px rgba(0,0,0,0.8); }
+
+    /* LSS WIDGET */
+    .lss-wrapper { position: absolute; left: var(--lss-x); top: var(--lss-y); transform: translate(-50%, -50%) scale(var(--lss-scale)); background: var(--lss-bg); border-radius: 30px; padding: 12px 30px; color: var(--lss-txt); font-family: 'Montserrat', sans-serif; font-size: 20px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 2px solid rgba(255,255,255,0.3); display: flex; gap: 15px; align-items: center; z-index: 90; cursor: grab; }
+    .lss-wrapper:active { cursor: grabbing; }
+    .lss-icon { font-size: 24px; }
+    .lss-animated { animation: lss-pulse 2s infinite cubic-bezier(0.4, 0, 0.6, 1); }
+    @keyframes lss-pulse { 0%, 100% { transform: translate(-50%, -50%) scale(var(--lss-scale)); } 50% { transform: translate(-50%, -50%) scale(calc(var(--lss-scale) * 1.05)); } }
+
+    /* CONTROLLER PANEL */
+    .controller-panel { position: absolute; top: 60px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; background: rgba(16, 20, 26, 0.95); padding: 20px; border-radius: 12px; border: 2px solid #333; width: 1150px; color: #fff; max-height: calc(100vh - 80px); z-index: 1000; box-shadow: 0 20px 50px rgba(0,0,0,0.9); transition: width 0.3s ease; }
+    .controls-body { overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 8px; }
+    .ctrl-master-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 16px; border-bottom: 2px solid #333; margin-bottom: 16px; position: sticky; top: -20px; background: rgba(16, 20, 26, 0.95); z-index: 10; cursor: grab; }
+    .ctrl-master-header:active { cursor: grabbing; }
+    .layout-name-badge { background: #333; padding: 4px 10px; border-radius: 4px; font-size: 12px; color: #aaa; margin-left: 10px; font-weight: bold; pointer-events: none; }
+    .collapsible-header { background: #1e242d; color: #fff; padding: 14px 18px; cursor: pointer; font-weight: 800; font-family: 'Montserrat', sans-serif; letter-spacing: 1px; border: 1px solid #444; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; text-transform: uppercase; margin-bottom: 4px; transition: background 0.2s; }
+    .collapsible-header:hover { background: #2a323d; }
+    .collapsible-content { display: none; padding: 20px; background: rgba(0, 0, 0, 0.2); border: 1px solid #444; border-top: none; border-radius: 0 0 6px 6px; flex-direction: column; gap: 16px; margin-top: -8px; margin-bottom: 12px; }
+    .collapsible-content.active { display: flex; }
+    .ctrl-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-start; align-items: center; }
+    .sub-panel { background: rgba(0,0,0,0.4); padding: 16px; border-radius: 8px; border: 1px solid #333; margin-bottom: 12px; width: 100%; }
+    .ctrl-btn { background: #2b323c; color: #eee; border: 1px solid #555; padding: 8px 16px; font-size: 13px; font-weight: bold; border-radius: 6px; cursor: pointer; transition: background 0.2s, transform 0.1s; }
+    .ctrl-btn:hover { background: #3b4451; }
+    .ctrl-btn.highlight { background: #1a4d2e; border-color: #277144; color: #fff; }
+    .ctrl-btn.warning { background: #8a2b2b; border-color: #a63a3a; color: #fff; }
+    .ctrl-btn.special { background: #2563eb; border-color: #1d4ed8; color: #fff; }
+    .ctrl-btn.sync-btn { background: #eab308; border-color: #ca8a04; color: #000; font-size: 15px; padding: 10px 24px; box-shadow: 0 4px 10px rgba(234, 179, 8, 0.3); }
+    .slider-group { display: flex; gap: 20px; flex-wrap: wrap; justify-content: flex-start; }
+    .slider-container { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 11px; color: #ccc; font-weight: bold; text-transform: uppercase; }
+    .slider-container input[type="range"] { width: 80px; cursor: pointer; accent-color: #eab308; }
+    .slider-container input[type="color"] { border: 1px solid #555; border-radius: 4px; width: 34px; height: 34px; cursor: pointer; background: #222; padding:0; }
+    input.auto-text { padding: 8px 12px; border-radius: 4px; border: 1px solid #555; background: #222; color: #fff; font-family: 'Montserrat', sans-serif; font-weight: bold; font-size: 14px; width: 100%; }
+    input.auto-text:focus { outline: 2px solid #eab308; border-color: transparent; }
+    .section-title { font-size: 13px; color: #ffd700; font-weight: 800; text-transform: uppercase; width: 100%; text-align: left; margin-bottom: 8px; letter-spacing: 1px; display: block; border-bottom: 1px solid #444; padding-bottom: 6px; }
+
+    /* Drag Hint Overlay */
+    #drag-hint { position: absolute; left: 50%; top: 10%; transform: translateX(-50%); background: rgba(234, 179, 8, 0.9); color: #000; padding: 10px 20px; border-radius: 20px; font-size: 14px; font-weight: 900; display: none; pointer-events: none; z-index: 10000; box-shadow: 0 5px 15px rgba(0,0,0,0.5); text-transform: uppercase; }
+
+    /* Modals */
+    .modal-bg { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); z-index: 9999; }
+    .modal-content { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #161b22; border: 2px solid #30363d; z-index: 10000; padding: 24px; border-radius: 8px; color: #fff; box-shadow: 0 20px 50px rgba(0,0,0,0.9); }
+    .list-item-row { padding: 10px 12px; border-bottom: 1px solid #30363d; display: flex; justify-content: space-between; align-items: center; transition: background 0.2s; }
+    .list-item-row:hover { background: #21262d; }
+    .list-item-row:last-child { border-bottom: none; }
+  </style>
+</head>
+<body>
+
+  <script>
+    const fontOptions = `
+      <option value="'Montserrat', sans-serif">Montserrat</option><option value="'Teko', sans-serif">Teko</option>
+      <option value="'Roboto', sans-serif">Roboto</option><option value="'Bebas Neue', sans-serif">Bebas Neue</option>
+      <option value="'Oswald', sans-serif">Oswald</option><option value="'Anton', sans-serif">Anton</option>
+      <option value="'Poppins', sans-serif">Poppins</option><option value="'Lato', sans-serif">Lato</option>
+      <option value="'Open Sans', sans-serif">Open Sans</option><option value="'Raleway', sans-serif">Raleway</option>
+      <option value="'Ubuntu', sans-serif">Ubuntu</option><option value="'PT Sans', sans-serif">PT Sans</option>
+      <option value="'Merriweather', serif">Merriweather</option><option value="'Playfair Display', serif">Playfair Display</option>
+      <option value="'Rubik', sans-serif">Rubik</option><option value="'Work Sans', sans-serif">Work Sans</option>
+      <option value="'Nunito', sans-serif">Nunito</option><option value="'Fira Sans', sans-serif">Fira Sans</option>
+      <option value="'Inter', sans-serif">Inter</option>
+    `;
+  </script>
+
+  <!-- MODALS -->
+  <div class="modal-bg" id="modal-bg" onclick="closeModals()"></div>
+  <div class="modal-content" id="layout-modal" style="width: 450px;">
+    <h3 style="margin-bottom: 15px; color: #ffd700; text-transform: uppercase;">Load Layout Preset</h3>
+    <div id="layout-list" style="max-height: 350px; overflow-y: auto; border: 1px solid #30363d; border-radius: 4px; background: #0d1117;"></div>
+    <div style="display: flex; justify-content: flex-end; margin-top: 20px;"><button class="ctrl-btn" onclick="closeModals()">Cancel</button></div>
+  </div>
+
+  <div class="modal-content" id="manual-modal" style="width: 800px; max-height: 85vh; overflow-y: auto; font-family: 'Montserrat', sans-serif;">
+    <h2 style="color: #ffd700; text-transform: uppercase; letter-spacing: 1px; border-bottom: 2px solid #30363d; padding-bottom: 10px; margin-bottom: 20px;">Live Discussion Suite V5.0 | Manual</h2>
+    <div style="line-height: 1.6; font-size: 14px;">
+      <p style="margin-bottom: 20px;">Welcome to the <strong>Ultimate Broadcast Overlay</strong>. This highly customizable, real-time sports graphic suite runs entirely in your browser.</p>
+      
+      <h3 style="color: #4ade80; border-bottom: 1px solid #30363d; padding-bottom: 5px;">I. System Setup & Views</h3>
+      <ul style="margin-left: 20px; margin-bottom: 15px; margin-top: 5px;">
+        <li><strong>Control Panel (Your Screen):</strong> Open the main HTML file normally in your web browser.</li>
+        <li><strong>Live Overlay (Audience Screen):</strong> In OBS/vMix, add this HTML file as a <strong>Browser Source</strong> and append <code>?view=overlay</code> to the end of the file path. The control panel will hide, leaving only transparent graphics.</li>
+      </ul>
+
+      <h3 style="color: #4ade80; margin-top: 20px; border-bottom: 1px solid #30363d; padding-bottom: 5px;">II. Dynamic Interaction & Syncing</h3>
+      <ul style="margin-left: 20px; margin-bottom: 15px; margin-top: 5px;">
+        <li><strong>Instant Actions:</strong> Typing in text boxes, clicking "Set Now/Next", and toggling visibility checkboxes update immediately on stream.</li>
+        <li><strong>Draft Actions (Requires SYNC):</strong> Changing fonts, sizes, and colors preview locally in real-time as you drag the sliders. Click <strong>"SYNC TO STREAM"</strong> to push them live to your audience.</li>
+        <li><strong>Click & Drag:</strong> You can click and drag the Vertical Agenda Panels, the Guest Nameplates, and the LSS Widget anywhere on the screen. The position automatically syncs.</li>
+      </ul>
+
+      <h3 style="color: #4ade80; margin-top: 20px; border-bottom: 1px solid #30363d; padding-bottom: 5px;">III. Features</h3>
+      <ul style="margin-left: 20px; margin-bottom: 15px;">
+        <li><strong>Agenda Tracker:</strong> 3-Row board. You can customize the background for the entire row *and* independently style the "Discussing Now" / "Up Next" badges.</li>
+        <li><strong>Vertical Agenda Panel (Linked & Auto-Sorting):</strong> Build your run-of-show list here. Clicking "Set Now", "Set Next", or "Mark Done" automatically sorts the list and pushes the text directly to the top Agenda Tracker. The Live item jumps to the top, upcoming items tuck underneath, and completed items drop to the bottom with a green checkmark!</li>
+        <li><strong>Custom Vertical List (Free Text):</strong> An independent list panel perfect for displaying "Team Strengths" or "Weaknesses". You can freely highlight multiple rows at the same time using a custom color picker for each row.</li>
+        <li><strong>Guest Nameplates:</strong> Add unlimited guests. Drag them into position under your webcams. Each guest has completely independent styling for their name and title backgrounds.</li>
+        <li><strong>Border Presets:</strong> Quickly snap professional camera borders. We've pre-loaded 10 themes, but you can create and save your own.</li>
+        <li><strong>Undo/Redo/Reset:</strong> Made a mistake? Use Undo/Redo at the top. Reset wipes all unsaved changes and returns to your launch state.</li>
+        <li><strong>Global Layout Presets:</strong> 6 distinct themes (Cyberpunk, Minimalist, Sunset, etc.) available in 3 sizes each (Small, Regular, Large). Loading these recolors the ENTIRE broadcast suite.</li>
+      </ul>
+    </div>
+    <div style="display: flex; justify-content: flex-end; margin-top: 25px; border-top: 1px solid #30363d; padding-top: 15px;">
+      <button class="ctrl-btn highlight" onclick="closeModals()" style="font-size: 14px; padding: 8px 24px;">Got it, Close Manual</button>
+    </div>
+  </div>
+
+  <div class="modal-content" id="save-warning-modal" style="text-align: center; width: 350px;">
+    <h3 style="color: #ff3344; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px;">Warning</h3>
+    <p style="margin-bottom: 25px; font-size: 15px; line-height: 1.5;">This will overwrite the current layout. Are you sure you want to save?</p>
+    <div style="display: flex; justify-content: center; gap: 15px;">
+      <button class="ctrl-btn highlight" onclick="confirmSaveLayout()">Save</button>
+      <button class="ctrl-btn" onclick="closeModals()">Cancel</button>
+    </div>
+  </div>
+
+  <div id="drag-hint">DRAGGING ELEMENT...</div>
+
+  <!-- OVERLAY RENDER CONTAINERS -->
+  <div class="cam-frame" id="global-frame"></div>
+  <div class="sub-count-wrapper"><iframe src="https://socialcounts.org/youtube-live-subscriber-count/UC6HP5_0MxNjZddNg9_t47gg/embed" allowtransparency="true" frameborder="0" scrolling="no"></iframe></div>
+
+  <div class="targets-wrapper" id="targets-wrapper">
+    <div class="target-row"><span class="target-label">Like Target</span><span class="target-value" id="like-target-display">25</span></div>
+    <div class="target-row"><span class="target-label">Sub Target</span><span class="target-value" id="sub-target-display">900</span></div>
+  </div>
+
+  <!-- Agenda Tracker Board -->
+  <div class="agenda-wrapper" id="agenda-wrapper">
+    <div class="ag-row" id="ag-row-1">Sports Unplugged India | Live Discussion</div>
+    <div class="ag-row" id="ag-row-2"><span class="ag-badge" id="ag-badge-2">DISCUSSING NOW</span><span class="ag-text" id="ag-text-2">Pre-Match Build Up</span></div>
+    <div class="ag-row" id="ag-row-3"><span class="ag-badge" id="ag-badge-3">UP NEXT</span><span class="ag-text" id="ag-text-3">East Bengal Tactical Breakdown</span></div>
+  </div>
+
+  <!-- Dynamic Render Containers -->
+  <div id="overlay-nameplates"></div>
+
+  <!-- Vertical Agenda List -->
+  <div class="agenda-list-wrapper" id="agl-wrapper" style="display:none;">
+    <div class="agl-header" id="agl-title-display">Today's Agenda</div>
+    <div class="agl-body" id="agl-list-render"></div>
+  </div>
+
+  <!-- New Custom Vertical List (Free Text) -->
+  <div class="custom-list-wrapper" id="clp-wrapper" style="display:none;">
+    <div class="clp-header" id="clp-title-display">Key Talking Points</div>
+    <div class="clp-body" id="clp-list-render"></div>
+  </div>
+
+  <div class="ticker-wrapper" id="ticker-wrapper">
+    <div class="ticker-bg" id="ticker-bg"></div>
+    <div class="ticker-content"><span class="ticker-text scrolling" id="ticker-text">Welcome to Sports Unplugged India! Please Like and Subscribe.</span></div>
+  </div>
+
+  <div class="lss-wrapper lss-animated" id="lss-widget">
+    <span class="lss-icon">👍</span> LIKE &nbsp;|&nbsp; <span class="lss-icon">🔗</span> SHARE &nbsp;|&nbsp; <span class="lss-icon">🔔</span> SUBSCRIBE
+  </div>
+
+  <!-- CONTROL PANEL -->
+  <div class="controller-panel" id="controls">
+    <div class="ctrl-master-header">
+      <div style="display: flex; align-items: center; pointer-events: none;">
+        <span style="font-weight: 900; font-size: 20px; color: #fff; letter-spacing: 1.5px;">SUI DISCUSSION SUITE V5.0</span>
+        <span class="layout-name-badge" id="current-layout-badge">Layout: Default</span>
+      </div>
+      <div style="display: flex; gap: 6px; pointer-events: auto;">
+        <button class="ctrl-btn special" onclick="openManual()">Manual</button>
+        <button class="ctrl-btn" onclick="undo()">Undo</button>
+        <button class="ctrl-btn" onclick="redo()">Redo</button>
+        <button class="ctrl-btn warning" onclick="reset()">Reset</button>
+        <button class="ctrl-btn sync-btn" onclick="syncVisuals()">SYNC TO STREAM</button>
+        <button class="ctrl-btn" onclick="saveLayout()">Save</button>
+        <button class="ctrl-btn" onclick="saveLayoutAs()">Save As</button>
+        <button class="ctrl-btn" onclick="openLayoutModal()">Load</button>
+        <button class="ctrl-btn special" id="btn-toggle-panel" onclick="togglePanelBody()">Minimize</button>
+      </div>
+    </div>
+
+    <div class="controls-body" id="controls-body">
+      
+      <!-- 1. AGENDA TRACKER -->
+      <div class="collapsible-header" onclick="togglePanel('panel-ag')">1. Agenda Tracker Board <span id="panel-ag-icon">▲</span></div>
+      <div class="collapsible-content active" id="panel-ag">
+        <div class="sub-panel">
+          <label style="display:flex; align-items:center; gap:8px; font-weight:bold; font-size:13px; margin-bottom:12px;">
+            <input type="checkbox" id="ctrl-ag-vis" checked onchange="applyInstant()"> Enable Agenda Tracker
+          </label>
+          <div style="display:flex; flex-direction:column; gap:16px;">
+            <!-- Row 1 -->
+            <div style="display:flex; gap:10px; align-items:center;">
+              <span class="section-title" style="margin:0; border:none; width:120px;">Top Header</span>
+              <input type="text" class="auto-text" id="ag-r1-txt" oninput="applyInstant()">
+              <input type="range" id="ag-r1-f" min="14" max="40" style="width:60px;" oninput="applyVisualsLocally()">
+              <input type="color" id="ag-r1-c" oninput="applyVisualsLocally()">
+              <select id="ag-r1-style" class="font-select" onchange="applyVisualsLocally()"><option value="solid">Solid</option><option value="split">Split</option><option value="gradient">Grad</option></select>
+              <input type="color" id="ag-r1-bg1" oninput="applyVisualsLocally()"> <input type="color" id="ag-r1-bg2" oninput="applyVisualsLocally()">
+            </div>
+            <!-- Row 2 -->
+            <div style="display:flex; gap:10px; align-items:center;">
+              <span class="section-title" style="margin:0; border:none; width:120px;">Discussing Now</span>
+              <input type="text" class="auto-text" id="ag-r2-txt" oninput="applyInstant()">
+              <input type="range" id="ag-r2-f" min="14" max="40" style="width:60px;" oninput="applyVisualsLocally()">
+              <input type="color" id="ag-r2-c" oninput="applyVisualsLocally()">
+              <select id="ag-r2-style" class="font-select" onchange="applyVisualsLocally()"><option value="solid">Solid</option><option value="split">Split</option><option value="gradient">Grad</option></select>
+              <input type="color" id="ag-r2-bg1" oninput="applyVisualsLocally()"> <input type="color" id="ag-r2-bg2" oninput="applyVisualsLocally()">
+            </div>
+            <div style="display:flex; gap:10px; align-items:center; background:rgba(0,0,0,0.2); padding:6px; border-radius:4px;">
+              <span style="font-size:11px; font-weight:bold; width:120px; color:#aaa;">Row 2 BADGE BG:</span>
+              <input type="color" id="ag-b2-c" oninput="applyVisualsLocally()" title="Badge Text Color">
+              <select id="ag-b2-style" class="font-select" onchange="applyVisualsLocally()"><option value="solid">Solid</option><option value="split">Split</option><option value="gradient">Grad</option></select>
+              <input type="color" id="ag-b2-bg1" oninput="applyVisualsLocally()"> <input type="color" id="ag-b2-bg2" oninput="applyVisualsLocally()">
+            </div>
+            <!-- Row 3 -->
+            <div style="display:flex; gap:10px; align-items:center;">
+              <span class="section-title" style="margin:0; border:none; width:120px;">Up Next</span>
+              <input type="text" class="auto-text" id="ag-r3-txt" oninput="applyInstant()">
+              <input type="range" id="ag-r3-f" min="12" max="30" style="width:60px;" oninput="applyVisualsLocally()">
+              <input type="color" id="ag-r3-c" oninput="applyVisualsLocally()">
+              <select id="ag-r3-style" class="font-select" onchange="applyVisualsLocally()"><option value="solid">Solid</option><option value="split">Split</option><option value="gradient">Grad</option></select>
+              <input type="color" id="ag-r3-bg1" oninput="applyVisualsLocally()"> <input type="color" id="ag-r3-bg2" oninput="applyVisualsLocally()">
+            </div>
+            <div style="display:flex; gap:10px; align-items:center; background:rgba(0,0,0,0.2); padding:6px; border-radius:4px;">
+              <span style="font-size:11px; font-weight:bold; width:120px; color:#aaa;">Row 3 BADGE BG:</span>
+              <input type="color" id="ag-b3-c" oninput="applyVisualsLocally()" title="Badge Text Color">
+              <select id="ag-b3-style" class="font-select" onchange="applyVisualsLocally()"><option value="solid">Solid</option><option value="split">Split</option><option value="gradient">Grad</option></select>
+              <input type="color" id="ag-b3-bg1" oninput="applyVisualsLocally()"> <input type="color" id="ag-b3-bg2" oninput="applyVisualsLocally()">
+            </div>
+          </div>
+        </div>
+        <div class="sub-panel slider-group" style="margin-bottom:0;">
+          <div class="slider-container"><span>Global Scale</span><input type="range" id="ag-scale" min="0.5" max="2" step="0.05" oninput="applyVisualsLocally()"></div>
+          <div class="slider-container"><span>Font Family</span><select id="ff-ag" class="font-select" onchange="applyVisualsLocally()"><script>document.write(fontOptions);</script></select></div>
+        </div>
+      </div>
+
+      <!-- 2. VERTICAL AGENDA LIST (AUTO-SORTING) -->
+      <div class="collapsible-header" onclick="togglePanel('panel-agl')">2. Vertical Agenda Panel (Linked & Auto-Sorting) <span id="panel-agl-icon">▼</span></div>
+      <div class="collapsible-content" id="panel-agl">
+        <div class="sub-panel">
+          <div class="ctrl-row" style="margin-bottom: 12px; justify-content:space-between;">
+            <label style="display:flex; align-items:center; gap:8px; font-weight:bold; font-size:13px;"><input type="checkbox" id="agl-vis" onchange="applyInstant()"> Show Vertical Agenda List</label>
+            <div style="display:flex; gap:8px;">
+              <input type="text" class="auto-text" id="agl-title" value="Today's Agenda" style="width:200px;" oninput="applyInstant()">
+              <button class="ctrl-btn highlight" onclick="addAgendaItem()">+ Add Topic</button>
+            </div>
+          </div>
+          <div id="agl-controls-container" style="display:flex; flex-direction:column; gap:8px;"></div>
+        </div>
+        <div class="sub-panel slider-group" style="margin-bottom:0;">
+          <span class="section-title">Panel Style (Draggable in overlay)</span>
+          <div class="slider-container"><span>Panel Scale</span><input type="range" id="agl-scale" min="0.5" max="2" step="0.05" oninput="applyVisualsLocally()"></div>
+          <div class="slider-container"><span>Text Color</span><input type="color" id="agl-txt-c" oninput="applyVisualsLocally()"></div>
+          <div class="slider-container"><span>BG Style</span><select id="agl-style" class="font-select" onchange="applyVisualsLocally()"><option value="solid">Solid</option><option value="split">Split</option><option value="gradient">Grad</option></select></div>
+          <div class="slider-container"><span>BG C1</span><input type="color" id="agl-c1" oninput="applyVisualsLocally()"></div>
+          <div class="slider-container"><span>BG C2</span><input type="color" id="agl-c2" oninput="applyVisualsLocally()"></div>
+          <span style="color:#eab308; font-size:12px; font-weight:bold; margin-left:auto;">* Drag the widget directly to move it</span>
+        </div>
+      </div>
+
+      <!-- 3. CUSTOM VERTICAL LIST (FREE TEXT) -->
+      <div class="collapsible-header" onclick="togglePanel('panel-clp')">3. Custom Vertical List (Free Text) <span id="panel-clp-icon">▼</span></div>
+      <div class="collapsible-content" id="panel-clp">
+        <div class="sub-panel">
+          <div class="ctrl-row" style="margin-bottom: 12px; justify-content:space-between;">
+            <label style="display:flex; align-items:center; gap:8px; font-weight:bold; font-size:13px;"><input type="checkbox" id="clp-vis" onchange="applyInstant()"> Show Custom List</label>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <span style="font-size:10px; font-weight:bold; color:#ccc;">GLOBAL HL:</span>
+              <input type="color" id="clp-global-hlc" oninput="applyGlobalClpHighlight()" style="width:24px; height:24px; padding:0; border:none; cursor:pointer;" title="Global Highlight Color">
+              <input type="text" class="auto-text" id="clp-title" value="Team Strengths" style="width:160px;" oninput="applyInstant()">
+              <button class="ctrl-btn highlight" onclick="addClpItem()">+ Add Point</button>
+            </div>
+          </div>
+          <div id="clp-controls-container" style="display:flex; flex-direction:column; gap:8px;"></div>
+        </div>
+        <div class="sub-panel slider-group" style="margin-bottom:0;">
+          <span class="section-title">Panel Style (Draggable in overlay)</span>
+          <div class="slider-container"><span>Panel Scale</span><input type="range" id="clp-scale" min="0.5" max="2" step="0.05" oninput="applyVisualsLocally()"></div>
+          <div class="slider-container"><span>Text Color</span><input type="color" id="clp-txt-c" oninput="applyVisualsLocally()"></div>
+          <div class="slider-container"><span>BG Style</span><select id="clp-style" class="font-select" onchange="applyVisualsLocally()"><option value="solid">Solid</option><option value="split">Split</option><option value="gradient">Grad</option></select></div>
+          <div class="slider-container"><span>BG C1</span><input type="color" id="clp-c1" oninput="applyVisualsLocally()"></div>
+          <div class="slider-container"><span>BG C2</span><input type="color" id="clp-c2" oninput="applyVisualsLocally()"></div>
+          <span style="color:#eab308; font-size:12px; font-weight:bold; margin-left:auto;">* Drag the widget directly to move it</span>
+        </div>
+      </div>
+
+      <!-- 4. NAMEPLATES (HOSTS/GUESTS) -->
+      <div class="collapsible-header" onclick="togglePanel('panel-l3')">4. Guest Nameplates (Lower Thirds) <span id="panel-l3-icon">▼</span></div>
+      <div class="collapsible-content" id="panel-l3">
+        <div class="sub-panel">
+          <div style="display:flex; justify-content:space-between; margin-bottom:12px;">
+            <span class="section-title" style="margin:0; border:none; width:auto;">Manage Guests</span>
+            <button class="ctrl-btn highlight" onclick="addNameplate()">+ Add Guest</button>
+          </div>
+          <div id="nameplate-controls-container" style="display:flex; flex-direction:column; gap:10px;"></div>
+        </div>
+        <div class="sub-panel slider-group" style="margin-bottom:0;">
+          <span class="section-title">Global Typography</span>
+          <div class="slider-container"><span>Font Family</span><select id="ff-l3" class="font-select" onchange="applyVisualsLocally()"><script>document.write(fontOptions);</script></select></div>
+          <div class="slider-container"><span>Name Size</span><input type="range" id="l3-f-name" min="14" max="50" oninput="applyVisualsLocally()"></div>
+          <div class="slider-container"><span>Title Size</span><input type="range" id="l3-f-title" min="10" max="30" oninput="applyVisualsLocally()"></div>
+          <span style="color:#eab308; font-size:12px; font-weight:bold; margin-left:auto;">* Drag nameplates directly to move them</span>
+        </div>
+      </div>
+
+      <!-- 5. LSS & TICKER -->
+      <div class="collapsible-header" onclick="togglePanel('panel-tk')">5. Ticker & LSS Animation <span id="panel-tk-icon">▼</span></div>
+      <div class="collapsible-content" id="panel-tk">
+        <div class="sub-panel">
+          <span class="section-title">Like / Share / Subscribe</span>
+          <div class="ctrl-row" style="margin-bottom:12px;">
+            <label style="font-weight:bold;"><input type="checkbox" id="lss-vis" onchange="applyInstant()"> Show</label>
+            <label style="font-weight:bold; margin-left:15px;"><input type="checkbox" id="lss-anim" onchange="applyInstant()"> Pulsing Animation</label>
+          </div>
+          <div class="slider-group">
+            <div class="slider-container"><span>Scale</span><input type="range" id="lss-scale" min="0.3" max="2" step="0.05" oninput="applyVisualsLocally()"></div>
+            <div class="slider-container"><span>Text C</span><input type="color" id="lss-txt-c" oninput="applyVisualsLocally()"></div>
+            <div class="slider-container"><span>BG Style</span><select id="lss-style" class="font-select" onchange="applyVisualsLocally()"><option value="solid">Solid</option><option value="split">Split</option><option value="gradient">Grad</option></select></div>
+            <div class="slider-container"><span>BG C1</span><input type="color" id="lss-c1" oninput="applyVisualsLocally()"></div>
+            <div class="slider-container"><span>BG C2</span><input type="color" id="lss-c2" oninput="applyVisualsLocally()"></div>
+            <span style="color:#eab308; font-size:12px; font-weight:bold; margin-left:auto;">* Drag widget to move</span>
+          </div>
+        </div>
+        <div class="sub-panel">
+          <span class="section-title">Bottom Ticker</span>
+          <div class="ctrl-row" style="margin-bottom:10px;">
+            <label style="font-weight:bold;"><input type="checkbox" id="tk-vis" onchange="applyInstant()"> Show</label>
+            <label style="font-weight:bold; margin-left:15px;"><input type="checkbox" id="tk-scroll" onchange="applyInstant()"> Scroll</label>
+            <input type="text" class="auto-text" id="tk-txt" oninput="applyInstant()" style="flex:1; margin-left:15px;">
+          </div>
+          <div class="slider-group">
+            <div class="slider-container"><span>Font Fam</span><select id="ff-tk" class="font-select" onchange="applyVisualsLocally()"><script>document.write(fontOptions);</script></select></div>
+            <div class="slider-container"><span>Font Size</span><input type="range" id="tk-f" min="12" max="60" oninput="applyVisualsLocally()"></div>
+            <div class="slider-container"><span>Text C</span><input type="color" id="tk-txt-c" oninput="applyVisualsLocally()"></div>
+            <div class="slider-container"><span>Height</span><input type="range" id="tk-h" min="20" max="100" oninput="applyVisualsLocally()"></div>
+            <div class="slider-container"><span>Opacity</span><input type="range" id="tk-op" min="0.2" max="1" step="0.05" oninput="applyVisualsLocally()"></div>
+            <div class="slider-container" style="border-left:1px solid #444; padding-left:15px;"><span>BG Style</span><select id="tk-style" class="font-select" onchange="applyVisualsLocally()"><option value="solid">Solid</option><option value="split">Split</option><option value="gradient">Grad</option></select></div>
+            <div class="slider-container"><span>BG C1</span><input type="color" id="tk-c1" oninput="applyVisualsLocally()"></div>
+            <div class="slider-container"><span>BG C2</span><input type="color" id="tk-c2" oninput="applyVisualsLocally()"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. BORDERS -->
+      <div class="collapsible-header" onclick="togglePanel('panel-br')">6. Screen Border & Presets <span id="panel-br-icon">▼</span></div>
+      <div class="collapsible-content" id="panel-br">
+        <div class="sub-panel">
+          <div class="ctrl-row" style="margin-bottom:15px; justify-content:space-between;">
+            <label style="font-weight:bold; font-size:14px;"><input type="checkbox" id="br-vis" onchange="applyInstant()"> Enable Global Border</label>
+            <div style="display:flex; gap:8px;">
+              <select id="br-preset-sel" class="font-select" style="width:140px;"><option value="">Select Preset...</option></select>
+              <button class="ctrl-btn highlight" onclick="loadBorderPreset()">Load</button>
+              <button class="ctrl-btn" onclick="saveBorderPreset()">Save New</button>
+              <button class="ctrl-btn warning" onclick="deleteBorderPreset()">Del</button>
+            </div>
+          </div>
+          <div class="slider-group">
+            <div class="slider-container"><span>Thickness</span><input type="range" id="br-w" min="0" max="40" oninput="applyVisualsLocally()"></div>
+            <div class="slider-container"><span>Opacity</span><input type="range" id="br-op" min="0" max="1" step="0.05" oninput="applyVisualsLocally()"></div>
+            <div class="slider-container" style="border-left:1px solid #444; padding-left:15px;"><span>Style</span><select id="br-style" class="font-select" onchange="applyVisualsLocally()"><option value="solid">Solid</option><option value="split">Split</option><option value="gradient">Gradient</option></select></div>
+            <div class="slider-container"><span>Color 1</span><input type="color" id="br-c1" oninput="applyVisualsLocally()"></div>
+            <div class="slider-container"><span>Color 2</span><input type="color" id="br-c2" oninput="applyVisualsLocally()"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 7. TARGETS -->
+      <div class="collapsible-header" onclick="togglePanel('panel-tgt')">7. Targets Box <span id="panel-tgt-icon">▼</span></div>
+      <div class="collapsible-content" id="panel-tgt">
+        <div class="sub-panel">
+          <div class="ctrl-row" style="gap: 20px; margin-bottom:15px;">
+            <label style="font-weight:bold;"><input type="checkbox" id="tgt-vis" onchange="applyInstant()"> Show Target Box</label>
+            <span style="font-weight:bold;">Like:</span><input type="text" class="auto-text" id="tgt-like" style="width:80px;" oninput="applyInstant()">
+            <span style="font-weight:bold;">Sub:</span><input type="text" class="auto-text" id="tgt-sub" style="width:80px;" oninput="applyInstant()">
+          </div>
+          <div class="slider-group">
+            <div class="slider-container"><span>Scale</span><input type="range" id="tgt-scale" min="0.5" max="2" step="0.05" oninput="applyVisualsLocally()"></div>
+            <div class="slider-container"><span>Label Fam</span><select id="ff-tgt-lbl" class="font-select" onchange="applyVisualsLocally()"><script>document.write(fontOptions);</script></select></div>
+            <div class="slider-container"><span>Label Size</span><input type="range" id="tgt-f-lbl" min="8" max="24" oninput="applyVisualsLocally()"></div>
+            <div class="slider-container"><span>Num Fam</span><select id="ff-tgt-val" class="font-select" onchange="applyVisualsLocally()"><script>document.write(fontOptions);</script></select></div>
+            <div class="slider-container"><span>Num Size</span><input type="range" id="tgt-f-val" min="15" max="60" oninput="applyVisualsLocally()"></div>
+            <div class="slider-container" style="border-left:1px solid #444; padding-left:15px;"><span>Style</span><select id="tgt-style" class="font-select" onchange="applyVisualsLocally()"><option value="solid">Solid</option><option value="split">Split</option><option value="gradient">Grad</option></select></div>
+            <div class="slider-container"><span>C1</span><input type="color" id="tgt-c1" oninput="applyVisualsLocally()"></div>
+            <div class="slider-container"><span>C2</span><input type="color" id="tgt-c2" oninput="applyVisualsLocally()"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const isOverlay = urlParams.get('view') === 'overlay';
+    if (isOverlay) { document.getElementById('controls').style.display = 'none'; document.getElementById('drag-hint').style.display = 'none'; }
+
+    // Set Default Dropdowns
+    document.getElementById('ff-ag').value = "'Montserrat', sans-serif";
+    document.getElementById('ff-l3').value = "'Montserrat', sans-serif";
+    document.getElementById('ff-tk').value = "'Montserrat', sans-serif";
+    document.getElementById('ff-tgt-lbl').value = "'Montserrat', sans-serif";
+    document.getElementById('ff-tgt-val').value = "'Teko', sans-serif";
+
+    // History Engine
+    let undoStack = [];
+    let redoStack = [];
+    let initialStateStr = null;
+
+    function saveHistory() {
+      undoStack.push(JSON.parse(JSON.stringify(state)));
+      redoStack = [];
+      if(undoStack.length > 50) undoStack.shift();
+    }
+    function undo() {
+      if(undoStack.length === 0) return;
+      redoStack.push(JSON.parse(JSON.stringify(state)));
+      state = undoStack.pop();
+      fullRender(true); syncVisuals();
+    }
+    function redo() {
+      if(redoStack.length === 0) return;
+      undoStack.push(JSON.parse(JSON.stringify(state)));
+      state = redoStack.pop();
+      fullRender(true); syncVisuals();
+    }
+    function reset() {
+      saveHistory();
+      state = JSON.parse(initialStateStr);
+      fullRender(true); syncVisuals();
+    }
+
+    if(!isOverlay) {
+      document.getElementById('controls').addEventListener('change', (e) => {
+        if(e.target.tagName !== 'INPUT' && e.target.tagName !== 'SELECT') return;
+        saveHistory(); 
+      });
+    }
+
+    // Modals
+    function openLayoutModal() { document.getElementById('modal-bg').style.display = 'block'; document.getElementById('layout-modal').style.display = 'block'; renderLayoutList(); }
+    function openManual() { document.getElementById('modal-bg').style.display = 'block'; document.getElementById('manual-modal').style.display = 'block'; }
+    function closeModals() { document.getElementById('modal-bg').style.display = 'none'; document.getElementById('layout-modal').style.display = 'none'; document.getElementById('manual-modal').style.display = 'none'; document.getElementById('save-warning-modal').style.display = 'none'; }
+
+    // Panels
+    function togglePanel(id) { const c = document.getElementById(id); const i = document.getElementById(id + '-icon'); if (c.classList.contains('active')) { c.classList.remove('active'); i.textContent = '▼'; } else { c.classList.add('active'); i.textContent = '▲'; } }
+    function togglePanelBody() { const b = document.getElementById('controls-body'); const btn = document.getElementById('btn-toggle-panel'); if (b.style.display === 'none') { b.style.display = 'flex'; btn.textContent = 'Minimize Panel'; } else { b.style.display = 'none'; btn.textContent = 'Expand Panel'; } }
+
+    // Unified Drag Logic
+    let isDraggingEl = null, isDraggingPanel = false;
+    let sX, sY, iL, iT;
+
+    document.querySelector('.ctrl-master-header').addEventListener('mousedown', (e) => {
+      if(e.target.closest('button')) return; isDraggingPanel = true;
+      const rect = document.getElementById('controls').getBoundingClientRect();
+      sX = e.clientX; sY = e.clientY; iL = rect.left; iT = rect.top;
+      document.getElementById('controls').style.left = iL + 'px'; document.getElementById('controls').style.top = iT + 'px'; document.getElementById('controls').style.transform = 'none';
+    });
+
+    function attachDraggable(el, updateCallback) {
+      if(el.dataset.dragAttached) return;
+      el.dataset.dragAttached = "true";
+      el.addEventListener('mousedown', (e) => {
+        if(isOverlay || e.button !== 0) return;
+        isDraggingEl = { el, updateCallback };
+        document.getElementById('drag-hint').style.display = 'block';
+      });
+    }
+
+    document.addEventListener('mousemove', (e) => {
+      if(isDraggingPanel) {
+        document.getElementById('controls').style.left = (iL + e.clientX - sX) + 'px'; document.getElementById('controls').style.top = (iT + e.clientY - sY) + 'px';
+      }
+      if(isDraggingEl) {
+        const px = (e.clientX / window.innerWidth) * 100; const py = (e.clientY / window.innerHeight) * 100;
+        isDraggingEl.el.style.left = px + '%'; isDraggingEl.el.style.top = py + '%';
+        isDraggingEl.updateCallback(px, py);
+      }
+    });
+
+    document.addEventListener('mouseup', () => {
+      isDraggingPanel = false;
+      if(isDraggingEl) { saveHistory(); isDraggingEl = null; document.getElementById('drag-hint').style.display = 'none'; syncVisuals(); }
+    });
+
+    // MASTER STATE
+    let state = {
+      // Agenda Tracker
+      agVis: true, agScale: 1, ffAg: "'Montserrat', sans-serif",
+      agR1Txt: "Sports Unplugged India | Live Discussion", agR1F: 24, agR1C: "#ffffff", agR1Style: "gradient", agR1Bg1: "#111111", agR1Bg2: "#222222",
+      agR2Txt: "Pre-Match Build Up", agR2F: 18, agR2C: "#ffffff", agR2Style: "split", agR2Bg1: "#d31122", agR2Bg2: "#f6b200", agB2C: "#111111", agB2Style: "solid", agB2Bg1: "#ffd700", agB2Bg2: "#ffd700",
+      agR3Txt: "East Bengal Tactical Breakdown", agR3F: 16, agR3C: "#aaaaaa", agR3Style: "solid", agR3Bg1: "#111111", agR3Bg2: "#111111", agB3C: "#ffffff", agB3Style: "solid", agB3Bg1: "#3b82f6", agB3Bg2: "#3b82f6",
+      
+      // Agenda Vertical List (Linked)
+      aglVis: false, aglTitle: "Today's Agenda", aglScale: 1, aglX: 80, aglY: 50, aglTxtC: "#ffffff", aglStyle: "gradient", aglC1: "#111111", aglC2: "#222222",
+      agendaItems: [ {id: 1, text: "Pre-Match Build Up", status: "now"}, {id: 2, text: "East Bengal Tactical Breakdown", status: "next"} ],
+
+      // Custom Vertical List (Free text)
+      clpVis: false, clpTitle: "Key Talking Points", clpScale: 1, clpX: 20, clpY: 50, clpTxtC: "#ffffff", clpStyle: "gradient", clpC1: "#111111", clpC2: "#222222", clpGlobalHlC: "#ffd700",
+      clpItems: [ {id: 1, text: "Strong Attack", hl: false, hlC: "#ffd700"} ],
+
+      // Nameplates
+      ffL3: "'Montserrat', sans-serif", l3FName: 26, l3FTitle: 14,
+      nameplates: [ { id: 1, name: "Ankit Bhattacharjee", title: "Host | SUI", vis: true, x: 20, y: 80, scale: 1, style: "gradient", c1: "#d31122", c2: "#f6b200", txtNameC: "#ffffff", txtTitleC: "#dddddd", titleStyle: "solid", titleBg1: "#0c0e12", titleBg2: "#0c0e12" } ],
+      
+      // LSS
+      lssVis: true, lssAnim: true, lssScale: 1, lssX: 50, lssY: 20, lssStyle: "gradient", lssC1: "#ff0000", lssC2: "#cc0000", lssTxtC: "#ffffff",
+      
+      // Ticker
+      tkVis: true, tkScroll: true, tkTxt: "Welcome to Sports Unplugged India! Please Like and Subscribe.", ffTk: "'Montserrat', sans-serif", tkF: 22, tkTxtC: "#ffffff", tkH: 40, tkOp: 0.9, tkStyle: "gradient", tkC1: "#1a202c", tkC2: "#2d3748",
+      
+      // Borders
+      brVis: false, brW: 8, brOp: 1, brStyle: "split", brC1: "#d31122", brC2: "#f6b200",
+      
+      // Targets
+      tgtVis: true, tgtLike: "25", tgtSub: "900", tgtScale: 1, ffTgtLbl: "'Montserrat', sans-serif", fTgtLbl: 13, ffTgtVal: "'Teko', sans-serif", fTgtVal: 30, tgtStyle: "gradient", tgtC1: "#2c3e50", tgtC2: "#636e72"
+    };
+
+    const pubnub = new PubNub({ publishKey: 'demo', subscribeKey: 'demo', userId: 'sui_v5_' + Math.random().toString(36).substring(2, 9) });
+    pubnub.subscribe({ channels: ['sui_v5_channel'] });
+    pubnub.addListener({ message: function(e) { Object.assign(state, e.message); fullRender(false); } });
+
+    // --- LOGIC FUNCTIONS ---
+    function getGrad(style, c1, c2) {
+      if(style === 'solid') return c1; if(style === 'split') return `linear-gradient(90deg, ${c1} 50%, ${c2} 50%)`; return `linear-gradient(135deg, ${c1} 0%, ${c2} 100%)`;
+    }
+
+    // Nameplates
+    function addNameplate() {
+      saveHistory();
+      state.nameplates.push({ id: Date.now(), name: "New Guest", title: "Analyst", vis: true, x: 80, y: 80, scale: 1, style: "gradient", c1: "#1e3a8a", c2: "#3b82f6", txtNameC: "#ffffff", txtTitleC: "#dddddd", titleStyle: "solid", titleBg1: "#0c0e12", titleBg2: "#0c0e12" });
+      fullRender(true); syncVisuals();
+    }
+    function removeNameplate(id) { saveHistory(); state.nameplates = state.nameplates.filter(n => n.id !== id); fullRender(true); syncVisuals(); }
+    
+    // Agenda Items (Linked & Auto-Sorting)
+    function addAgendaItem() {
+      saveHistory();
+      state.agendaItems.push({ id: Date.now(), text: "New Topic", status: "none" });
+      fullRender(true); syncVisuals();
+    }
+    function removeAgendaItem(id) { saveHistory(); state.agendaItems = state.agendaItems.filter(a => a.id !== id); fullRender(true); syncVisuals(); }
+    function setAgendaStatus(id, status) {
+      saveHistory();
+      const item = state.agendaItems.find(a => a.id === id);
+      
+      if(item.status === status) {
+        item.status = 'none'; // Toggle off if clicked twice
+      } else {
+        if(status === 'now') {
+          state.agendaItems.forEach(a => { if(a.status==='now') a.status='none'; }); 
+          item.status = 'now'; state.agR2Txt = item.text;
+        } else if (status === 'next') {
+          state.agendaItems.forEach(a => { if(a.status==='next') a.status='none'; }); 
+          item.status = 'next'; state.agR3Txt = item.text;
+        } else if (status === 'completed') {
+          item.status = 'completed';
+        }
+      }
+      
+      // Auto-Sort Engine
+      const order = { 'now': 1, 'next': 2, 'none': 3, 'completed': 4 };
+      state.agendaItems.sort((a, b) => order[a.status] - order[b.status]);
+      
+      fullRender(true); syncVisuals();
+    }
+
+    // Custom List Items (Free Text)
+    function addClpItem() {
+      saveHistory();
+      const color = state.clpGlobalHlC || "#ffd700";
+      state.clpItems.push({ id: Date.now(), text: "New Point", hl: false, hlC: color });
+      fullRender(true); syncVisuals();
+    }
+    function removeClpItem(id) { saveHistory(); state.clpItems = state.clpItems.filter(a => a.id !== id); fullRender(true); syncVisuals(); }
+    function toggleClpHighlight(id) {
+      saveHistory();
+      const item = state.clpItems.find(a => a.id === id);
+      item.hl = !item.hl;
+      fullRender(true); syncVisuals();
+    }
+    function applyGlobalClpHighlight() {
+      saveHistory();
+      const color = document.getElementById('clp-global-hlc').value;
+      state.clpGlobalHlC = color;
+      if(state.clpItems) { state.clpItems.forEach(item => { item.hlC = color; }); }
+      fullRender(true); syncVisuals();
+    }
+
+    // --- SYNC & RENDER ---
+    function applyInstant() {
+      state.agVis = document.getElementById('ctrl-ag-vis').checked;
+      state.agR1Txt = document.getElementById('ag-r1-txt').value;
+      state.agR2Txt = document.getElementById('ag-r2-txt').value;
+      state.agR3Txt = document.getElementById('ag-r3-txt').value;
+
+      state.aglVis = document.getElementById('agl-vis').checked;
+      state.aglTitle = document.getElementById('agl-title').value;
+      state.agendaItems.forEach(item => { item.text = document.getElementById(`agl-txt-${item.id}`).value; });
+
+      state.clpVis = document.getElementById('clp-vis').checked;
+      state.clpTitle = document.getElementById('clp-title').value;
+      state.clpItems = state.clpItems || [];
+      state.clpItems.forEach(item => {
+        if(document.getElementById(`clp-txt-${item.id}`)) {
+          item.text = document.getElementById(`clp-txt-${item.id}`).value;
+          item.hlC = document.getElementById(`clp-c-${item.id}`).value;
+        }
+      });
+
+      state.nameplates.forEach(np => {
+        np.vis = document.getElementById(`np-vis-${np.id}`).checked;
+        np.name = document.getElementById(`np-name-${np.id}`).value;
+        np.title = document.getElementById(`np-title-${np.id}`).value;
+      });
+
+      state.lssVis = document.getElementById('lss-vis').checked; state.lssAnim = document.getElementById('lss-anim').checked;
+      state.tkVis = document.getElementById('tk-vis').checked; state.tkScroll = document.getElementById('tk-scroll').checked; state.tkTxt = document.getElementById('tk-txt').value;
+      state.brVis = document.getElementById('br-vis').checked;
+      state.tgtVis = document.getElementById('tgt-vis').checked; state.tgtLike = document.getElementById('tgt-like').value; state.tgtSub = document.getElementById('tgt-sub').value;
+
+      pubnub.publish({ channel: 'sui_v5_channel', message: state });
+      fullRender(false); 
+    }
+
+    function applyVisualsLocally() {
+      state.agScale = document.getElementById('ag-scale').value; state.ffAg = document.getElementById('ff-ag').value;
+      state.agR1F = document.getElementById('ag-r1-f').value; state.agR1C = document.getElementById('ag-r1-c').value; state.agR1Style = document.getElementById('ag-r1-style').value; state.agR1Bg1 = document.getElementById('ag-r1-bg1').value; state.agR1Bg2 = document.getElementById('ag-r1-bg2').value;
+      state.agR2F = document.getElementById('ag-r2-f').value; state.agR2C = document.getElementById('ag-r2-c').value; state.agR2Style = document.getElementById('ag-r2-style').value; state.agR2Bg1 = document.getElementById('ag-r2-bg1').value; state.agR2Bg2 = document.getElementById('ag-r2-bg2').value;
+      state.agB2C = document.getElementById('ag-b2-c').value; state.agB2Style = document.getElementById('ag-b2-style').value; state.agB2Bg1 = document.getElementById('ag-b2-bg1').value; state.agB2Bg2 = document.getElementById('ag-b2-bg2').value;
+      state.agR3F = document.getElementById('ag-r3-f').value; state.agR3C = document.getElementById('ag-r3-c').value; state.agR3Style = document.getElementById('ag-r3-style').value; state.agR3Bg1 = document.getElementById('ag-r3-bg1').value; state.agR3Bg2 = document.getElementById('ag-r3-bg2').value;
+      state.agB3C = document.getElementById('ag-b3-c').value; state.agB3Style = document.getElementById('ag-b3-style').value; state.agB3Bg1 = document.getElementById('ag-b3-bg1').value; state.agB3Bg2 = document.getElementById('ag-b3-bg2').value;
+
+      state.aglScale = document.getElementById('agl-scale').value; state.aglTxtC = document.getElementById('agl-txt-c').value; state.aglStyle = document.getElementById('agl-style').value; state.aglC1 = document.getElementById('agl-c1').value; state.aglC2 = document.getElementById('agl-c2').value;
+      
+      state.clpScale = document.getElementById('clp-scale').value; state.clpTxtC = document.getElementById('clp-txt-c').value; state.clpStyle = document.getElementById('clp-style').value; state.clpC1 = document.getElementById('clp-c1').value; state.clpC2 = document.getElementById('clp-c2').value;
+
+      state.ffL3 = document.getElementById('ff-l3').value; state.l3FName = document.getElementById('l3-f-name').value; state.l3FTitle = document.getElementById('l3-f-title').value;
+
+      state.nameplates.forEach(np => {
+        if(document.getElementById(`np-scale-${np.id}`)) {
+          np.scale = document.getElementById(`np-scale-${np.id}`).value;
+          np.style = document.getElementById(`np-style-${np.id}`).value;
+          np.c1 = document.getElementById(`np-c1-${np.id}`).value;
+          np.c2 = document.getElementById(`np-c2-${np.id}`).value;
+          np.txtNameC = document.getElementById(`np-txt-name-c-${np.id}`).value;
+          np.txtTitleC = document.getElementById(`np-txt-title-c-${np.id}`).value;
+          np.titleStyle = document.getElementById(`np-title-style-${np.id}`).value;
+          np.titleBg1 = document.getElementById(`np-title-bg1-${np.id}`).value;
+          np.titleBg2 = document.getElementById(`np-title-bg2-${np.id}`).value;
+        }
+      });
+
+      state.lssScale = document.getElementById('lss-scale').value; state.lssTxtC = document.getElementById('lss-txt-c').value; state.lssStyle = document.getElementById('lss-style').value; state.lssC1 = document.getElementById('lss-c1').value; state.lssC2 = document.getElementById('lss-c2').value;
+      state.ffTk = document.getElementById('ff-tk').value; state.tkF = document.getElementById('tk-f').value; state.tkTxtC = document.getElementById('tk-txt-c').value; state.tkH = document.getElementById('tk-h').value; state.tkOp = document.getElementById('tk-op').value; state.tkStyle = document.getElementById('tk-style').value; state.tkC1 = document.getElementById('tk-c1').value; state.tkC2 = document.getElementById('tk-c2').value;
+      state.brW = document.getElementById('br-w').value; state.brOp = document.getElementById('br-op').value; state.brStyle = document.getElementById('br-style').value; state.brC1 = document.getElementById('br-c1').value; state.brC2 = document.getElementById('br-c2').value;
+      state.tgtScale = document.getElementById('tgt-scale').value; state.ffTgtLbl = document.getElementById('ff-tgt-lbl').value; state.fTgtLbl = document.getElementById('tgt-f-lbl').value; state.ffTgtVal = document.getElementById('ff-tgt-val').value; state.fTgtVal = document.getElementById('tgt-f-val').value; state.tgtStyle = document.getElementById('tgt-style').value; state.tgtC1 = document.getElementById('tgt-c1').value; state.tgtC2 = document.getElementById('tgt-c2').value;
+
+      applyCSSVars();
+    }
+
+    function syncVisuals() { applyVisualsLocally(); pubnub.publish({ channel: 'sui_v5_channel', message: state }); }
+
+    function applyCSSVars() {
+      const r = document.documentElement;
+      r.style.setProperty('--ag-scale', state.agScale); r.style.setProperty('--ff-ag', state.ffAg);
+      r.style.setProperty('--ag-r1-f', state.agR1F+'px'); r.style.setProperty('--ag-r1-c', state.agR1C); r.style.setProperty('--ag-r1-bg', getGrad(state.agR1Style, state.agR1Bg1, state.agR1Bg2));
+      r.style.setProperty('--ag-r2-f', state.agR2F+'px'); r.style.setProperty('--ag-r2-c', state.agR2C); r.style.setProperty('--ag-r2-bg', getGrad(state.agR2Style, state.agR2Bg1, state.agR2Bg2));
+      r.style.setProperty('--ag-b2-c', state.agB2C); r.style.setProperty('--ag-b2-bg', getGrad(state.agB2Style, state.agB2Bg1, state.agB2Bg2));
+      r.style.setProperty('--ag-r3-f', state.agR3F+'px'); r.style.setProperty('--ag-r3-c', state.agR3C); r.style.setProperty('--ag-r3-bg', getGrad(state.agR3Style, state.agR3Bg1, state.agR3Bg2));
+      r.style.setProperty('--ag-b3-c', state.agB3C); r.style.setProperty('--ag-b3-bg', getGrad(state.agB3Style, state.agB3Bg1, state.agB3Bg2));
+      
+      r.style.setProperty('--agl-scale', state.aglScale); r.style.setProperty('--agl-x', state.aglX+'%'); r.style.setProperty('--agl-y', state.aglY+'%'); r.style.setProperty('--agl-txt', state.aglTxtC); r.style.setProperty('--agl-bg', getGrad(state.aglStyle, state.aglC1, state.aglC2));
+      
+      r.style.setProperty('--clp-scale', state.clpScale); r.style.setProperty('--clp-x', state.clpX+'%'); r.style.setProperty('--clp-y', state.clpY+'%'); r.style.setProperty('--clp-txt', state.clpTxtC); r.style.setProperty('--clp-bg', getGrad(state.clpStyle, state.clpC1, state.clpC2));
+      
+      r.style.setProperty('--ff-l3', state.ffL3); r.style.setProperty('--l3-f-name', state.l3FName+'px'); r.style.setProperty('--l3-f-title', state.l3FTitle+'px');
+      
+      state.nameplates.forEach(np => {
+        const el = document.getElementById(`np-overlay-${np.id}`);
+        if(el) { 
+          el.style.left = np.x+'%'; el.style.top = np.y+'%'; el.style.transform = `translate(-50%, -50%) scale(${np.scale})`; 
+          const topEl = el.querySelector('.np-top');
+          const botEl = el.querySelector('.np-bottom');
+          if(topEl) { topEl.style.background = getGrad(np.style, np.c1, np.c2); topEl.style.color = np.txtNameC; }
+          if(botEl) { botEl.style.background = getGrad(np.titleStyle, np.titleBg1, np.titleBg2); botEl.style.color = np.txtTitleC; }
+        }
+      });
+
+      r.style.setProperty('--lss-scale', state.lssScale); r.style.setProperty('--lss-x', state.lssX+'%'); r.style.setProperty('--lss-y', state.lssY+'%'); r.style.setProperty('--lss-bg', getGrad(state.lssStyle, state.lssC1, state.lssC2)); r.style.setProperty('--lss-txt', state.lssTxtC);
+      
+      r.style.setProperty('--tk-h', state.tkH+'px'); r.style.setProperty('--ff-tk', state.ffTk); r.style.setProperty('--tk-f', state.tkF+'px'); r.style.setProperty('--tk-txt-c', state.tkTxtC); r.style.setProperty('--tk-op', state.tkOp);
+      document.getElementById('ticker-bg').style.background = getGrad(state.tkStyle, state.tkC1, state.tkC2);
+      
+      r.style.setProperty('--br-w', state.brW+'px'); r.style.setProperty('--br-op', state.brOp); r.style.setProperty('--br-style', getGrad(state.brStyle, state.brC1, state.brC2));
+      
+      r.style.setProperty('--target-scale', state.tgtScale); r.style.setProperty('--ff-tgt-lbl', state.ffTgtLbl); r.style.setProperty('--f-tgt-label', state.fTgtLbl+'px'); r.style.setProperty('--ff-tgt-val', state.ffTgtVal); r.style.setProperty('--f-tgt-val', state.fTgtVal+'px');
+      document.getElementById('targets-wrapper').style.background = getGrad(state.tgtStyle, state.tgtC1, state.tgtC2);
+    }
+
+    function fullRender(forceRebuildControls = false) {
+      if(!isOverlay) {
+        document.getElementById('clp-global-hlc').value = state.clpGlobalHlC || "#ffd700";
+
+        document.getElementById('ctrl-ag-vis').checked = state.agVis; document.getElementById('ag-r1-txt').value = state.agR1Txt; document.getElementById('ag-r2-txt').value = state.agR2Txt; document.getElementById('ag-r3-txt').value = state.agR3Txt;
+        document.getElementById('ag-r1-f').value = state.agR1F; document.getElementById('ag-r1-c').value = state.agR1C; document.getElementById('ag-r1-style').value = state.agR1Style; document.getElementById('ag-r1-bg1').value = state.agR1Bg1; document.getElementById('ag-r1-bg2').value = state.agR1Bg2;
+        document.getElementById('ag-r2-f').value = state.agR2F; document.getElementById('ag-r2-c').value = state.agR2C; document.getElementById('ag-r2-style').value = state.agR2Style; document.getElementById('ag-r2-bg1').value = state.agR2Bg1; document.getElementById('ag-r2-bg2').value = state.agR2Bg2;
+        document.getElementById('ag-b2-c').value = state.agB2C; document.getElementById('ag-b2-style').value = state.agB2Style; document.getElementById('ag-b2-bg1').value = state.agB2Bg1; document.getElementById('ag-b2-bg2').value = state.agB2Bg2;
+        document.getElementById('ag-r3-f').value = state.agR3F; document.getElementById('ag-r3-c').value = state.agR3C; document.getElementById('ag-r3-style').value = state.agR3Style; document.getElementById('ag-r3-bg1').value = state.agR3Bg1; document.getElementById('ag-r3-bg2').value = state.agR3Bg2;
+        document.getElementById('ag-b3-c').value = state.agB3C; document.getElementById('ag-b3-style').value = state.agB3Style; document.getElementById('ag-b3-bg1').value = state.agB3Bg1; document.getElementById('ag-b3-bg2').value = state.agB3Bg2;
+        document.getElementById('ag-scale').value = state.agScale; document.getElementById('ff-ag').value = state.ffAg;
+
+        document.getElementById('agl-vis').checked = state.aglVis; document.getElementById('agl-title').value = state.aglTitle;
+        document.getElementById('agl-scale').value = state.aglScale; document.getElementById('agl-txt-c').value = state.aglTxtC; document.getElementById('agl-style').value = state.aglStyle; document.getElementById('agl-c1').value = state.aglC1; document.getElementById('agl-c2').value = state.aglC2;
+        
+        document.getElementById('clp-vis').checked = state.clpVis; document.getElementById('clp-title').value = state.clpTitle;
+        document.getElementById('clp-scale').value = state.clpScale; document.getElementById('clp-txt-c').value = state.clpTxtC; document.getElementById('clp-style').value = state.clpStyle; document.getElementById('clp-c1').value = state.clpC1; document.getElementById('clp-c2').value = state.clpC2;
+
+        document.getElementById('ff-l3').value = state.ffL3; document.getElementById('l3-f-name').value = state.l3FName; document.getElementById('l3-f-title').value = state.l3FTitle;
+        
+        document.getElementById('lss-vis').checked = state.lssVis; document.getElementById('lss-anim').checked = state.lssAnim; document.getElementById('lss-scale').value = state.lssScale; document.getElementById('lss-txt-c').value = state.lssTxtC; document.getElementById('lss-style').value = state.lssStyle; document.getElementById('lss-c1').value = state.lssC1; document.getElementById('lss-c2').value = state.lssC2;
+        
+        document.getElementById('tk-vis').checked = state.tkVis; document.getElementById('tk-scroll').checked = state.tkScroll; document.getElementById('tk-txt').value = state.tkTxt;
+        document.getElementById('ff-tk').value = state.ffTk; document.getElementById('tk-f').value = state.tkF; document.getElementById('tk-txt-c').value = state.tkTxtC; document.getElementById('tk-h').value = state.tkH; document.getElementById('tk-op').value = state.tkOp; document.getElementById('tk-style').value = state.tkStyle; document.getElementById('tk-c1').value = state.tkC1; document.getElementById('tk-c2').value = state.tkC2;
+
+        document.getElementById('br-vis').checked = state.brVis; document.getElementById('br-w').value = state.brW; document.getElementById('br-op').value = state.brOp; document.getElementById('br-style').value = state.brStyle; document.getElementById('br-c1').value = state.brC1; document.getElementById('br-c2').value = state.brC2;
+        
+        document.getElementById('tgt-vis').checked = state.tgtVis; document.getElementById('tgt-like').value = state.tgtLike; document.getElementById('tgt-sub').value = state.tgtSub; document.getElementById('tgt-scale').value = state.tgtScale; document.getElementById('ff-tgt-lbl').value = state.ffTgtLbl; document.getElementById('tgt-f-lbl').value = state.fTgtLbl; document.getElementById('ff-tgt-val').value = state.ffTgtVal; document.getElementById('tgt-f-val').value = state.fTgtVal; document.getElementById('tgt-style').value = state.tgtStyle; document.getElementById('tgt-c1').value = state.tgtC1; document.getElementById('tgt-c2').value = state.tgtC2;
+        
+        if (forceRebuildControls) renderControls();
+      }
+
+      // Update Overlay DOM
+      document.getElementById('agenda-wrapper').style.display = state.agVis ? 'flex' : 'none';
+      document.getElementById('ag-row-1').textContent = state.agR1Txt; document.getElementById('ag-text-2').textContent = state.agR2Txt; document.getElementById('ag-text-3').textContent = state.agR3Txt;
+      
+      document.getElementById('agl-wrapper').style.display = state.aglVis ? 'flex' : 'none';
+      document.getElementById('agl-title-display').textContent = state.aglTitle;
+      
+      // Vertical Agenda Mapping with Live Bulb, Up Next, and Completed
+      document.getElementById('agl-list-render').innerHTML = state.agendaItems.map(i => {
+        let pre = i.status === 'now' ? '<div class="ag-live-bulb"></div>' : '';
+        let post = i.status === 'next' ? '<div class="ag-up-next">UP NEXT</div>' : (i.status === 'completed' ? '<div class="ag-completed">✔</div>' : '');
+        return `<div class="agl-item status-${i.status}">${pre}<span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${i.text}</span>${post}</div>`;
+      }).join('');
+      attachDraggable(document.getElementById('agl-wrapper'), (x, y) => { state.aglX = x; state.aglY = y; });
+
+      document.getElementById('clp-wrapper').style.display = state.clpVis ? 'flex' : 'none';
+      document.getElementById('clp-title-display').textContent = state.clpTitle;
+      document.getElementById('clp-list-render').innerHTML = (state.clpItems || []).map(i => {
+        let styleStr = i.hl ? `border-left-color: ${i.hlC}; background: ${i.hlC}33; color: ${i.hlC};` : '';
+        return `<div class="clp-item ${i.hl ? 'highlighted' : ''}" style="${styleStr}">${i.text}</div>`;
+      }).join('');
+      attachDraggable(document.getElementById('clp-wrapper'), (x, y) => { state.clpX = x; state.clpY = y; });
+
+      document.getElementById('overlay-nameplates').innerHTML = state.nameplates.map(np => 
+        np.vis ? `<div class="nameplate-wrapper" id="np-overlay-${np.id}" style="left:${np.x}%; top:${np.y}%;"><div class="np-top" style="color:${np.txtNameC}; background:${getGrad(np.style, np.c1, np.c2)};">${np.name}</div><div class="np-bottom" style="color:${np.txtTitleC}; background:${getGrad(np.titleStyle, np.titleBg1, np.titleBg2)};">${np.title}</div></div>` : ''
+      ).join('');
+      state.nameplates.forEach(np => {
+        const el = document.getElementById(`np-overlay-${np.id}`);
+        if(el) attachDraggable(el, (x, y) => { np.x = x; np.y = y; });
+      });
+
+      document.getElementById('lss-widget').style.display = state.lssVis ? 'flex' : 'none';
+      document.getElementById('lss-widget').className = state.lssAnim ? 'lss-wrapper lss-animated' : 'lss-wrapper';
+      attachDraggable(document.getElementById('lss-widget'), (x, y) => { state.lssX = x; state.lssY = y; });
+
+      document.getElementById('ticker-wrapper').style.display = state.tkVis ? 'flex' : 'none';
+      document.getElementById('ticker-text').textContent = state.tkTxt; document.getElementById('ticker-text').className = state.tkScroll ? 'ticker-text scrolling' : 'ticker-text static';
+
+      document.getElementById('global-frame').style.display = state.brVis ? 'block' : 'none';
+      
+      document.getElementById('targets-wrapper').style.display = state.tgtVis ? 'flex' : 'none';
+      document.getElementById('like-target-display').textContent = state.tgtLike; document.getElementById('sub-target-display').textContent = state.tgtSub;
+
+      applyCSSVars();
+    }
+
+    function renderControls() {
+      if(isOverlay) return;
+      document.getElementById('agl-controls-container').innerHTML = state.agendaItems.map(i => `
+        <div style="display:flex; gap:6px; align-items:center;">
+          <input type="text" class="auto-text" id="agl-txt-${i.id}" value="${i.text}" style="flex:1;" oninput="applyInstant()">
+          <button class="ctrl-btn ${i.status==='now'?'highlight':''}" onclick="setAgendaStatus(${i.id}, 'now')">${i.status==='now'?'Unset Now':'Set Now'}</button>
+          <button class="ctrl-btn ${i.status==='next'?'special':''}" onclick="setAgendaStatus(${i.id}, 'next')">${i.status==='next'?'Unset Next':'Set Next'}</button>
+          <button class="ctrl-btn ${i.status==='completed'?'warning':''}" onclick="setAgendaStatus(${i.id}, 'completed')" style="background:${i.status==='completed'?'#10b981':''}; border-color:${i.status==='completed'?'#059669':''}">${i.status==='completed'?'Unmark Done':'Mark Done'}</button>
+          <button class="ctrl-btn warning" onclick="removeAgendaItem(${i.id})">X</button>
+        </div>
+      `).join('');
+
+      document.getElementById('clp-controls-container').innerHTML = (state.clpItems || []).map(i => `
+        <div style="display:flex; gap:6px; align-items:center;">
+          <input type="text" class="auto-text" id="clp-txt-${i.id}" value="${i.text}" style="flex:1;" oninput="applyInstant()">
+          <input type="color" id="clp-c-${i.id}" value="${i.hlC}" oninput="applyInstant()" style="width:24px; height:24px; padding:0; border:none; cursor:pointer;" title="Highlight Color">
+          <button class="ctrl-btn ${i.hl?'highlight':''}" onclick="toggleClpHighlight(${i.id})">${i.hl?'Unhighlight':'Highlight'}</button>
+          <button class="ctrl-btn warning" onclick="removeClpItem(${i.id})">X</button>
+        </div>
+      `).join('');
+
+      document.getElementById('nameplate-controls-container').innerHTML = state.nameplates.map(np => `
+        <div style="background:rgba(0,0,0,0.3); padding:10px; border:1px solid #444; border-radius:6px;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+            <label style="font-weight:bold;"><input type="checkbox" id="np-vis-${np.id}" ${np.vis?'checked':''} onchange="applyInstant()"> Show</label>
+            <button class="ctrl-btn warning" style="padding:2px 8px; font-size:10px;" onclick="removeNameplate(${np.id})">Delete</button>
+          </div>
+          <div style="display:flex; gap:6px; margin-bottom:8px;">
+            <input type="text" class="auto-text" id="np-name-${np.id}" value="${np.name}" placeholder="Name" oninput="applyInstant()">
+            <input type="text" class="auto-text" id="np-title-${np.id}" value="${np.title}" placeholder="Title" oninput="applyInstant()">
+          </div>
+          <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:8px;">
+            <span style="font-size:10px; font-weight:bold; color:#ccc;">NAME BG:</span> 
+            <input type="range" id="np-scale-${np.id}" min="0.5" max="2" step="0.05" value="${np.scale}" style="width:50px;" oninput="applyVisualsLocally()">
+            <select id="np-style-${np.id}" class="font-select" onchange="applyVisualsLocally()"><option value="solid" ${np.style==='solid'?'selected':''}>Solid</option><option value="split" ${np.style==='split'?'selected':''}>Split</option><option value="gradient" ${np.style==='gradient'?'selected':''}>Grad</option></select>
+            <input type="color" id="np-c1-${np.id}" value="${np.c1}" oninput="applyVisualsLocally()" style="width:24px; height:24px;">
+            <input type="color" id="np-c2-${np.id}" value="${np.c2}" oninput="applyVisualsLocally()" style="width:24px; height:24px;">
+            
+            <span style="font-size:10px; font-weight:bold; color:#ccc; margin-left:10px;">NAME TEXT C:</span>
+            <input type="color" id="np-txt-name-c-${np.id}" value="${np.txtNameC}" oninput="applyVisualsLocally()" style="width:24px; height:24px;" title="Name Text Color">
+            
+            <span style="font-size:10px; font-weight:bold; color:#ccc; margin-left:10px;">TITLE TEXT C:</span>
+            <input type="color" id="np-txt-title-c-${np.id}" value="${np.txtTitleC}" oninput="applyVisualsLocally()" style="width:24px; height:24px;" title="Title Text Color">
+            
+            <span style="font-size:10px; font-weight:bold; color:#ccc; margin-left:10px;">TITLE BG:</span>
+            <select id="np-title-style-${np.id}" class="font-select" onchange="applyVisualsLocally()"><option value="solid" ${np.titleStyle==='solid'?'selected':''}>Solid</option><option value="split" ${np.titleStyle==='split'?'selected':''}>Split</option><option value="gradient" ${np.titleStyle==='gradient'?'selected':''}>Grad</option></select>
+            <input type="color" id="np-title-bg1-${np.id}" value="${np.titleBg1}" oninput="applyVisualsLocally()" style="width:24px; height:24px;">
+            <input type="color" id="np-title-bg2-${np.id}" value="${np.titleBg2}" oninput="applyVisualsLocally()" style="width:24px; height:24px;">
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // --- PRESETS & LAYOUTS ---
+    let borderPresets = {};
+    const defaultBorderPresets = {
+      'East Bengal Split': { w:8, op:1, style:'split', c1:'#d31122', c2:'#f6b200' },
+      'Cyber Gradient': { w:12, op:1, style:'gradient', c1:'#06b6d4', c2:'#9333ea' },
+      'Solid White Thin': { w:4, op:0.8, style:'solid', c1:'#ffffff', c2:'#ffffff' },
+      'Neon Blue': { w:8, op:1, style:'gradient', c1:'#00f2fe', c2:'#4facfe' },
+      'Crimson Force': { w:10, op:1, style:'split', c1:'#ff0844', c2:'#ffb199' },
+      'Emerald Outline': { w:6, op:0.9, style:'solid', c1:'#10b981', c2:'#10b981' },
+      'Royal Purple': { w:12, op:1, style:'gradient', c1:'#667eea', c2:'#764ba2' },
+      'Sunset Orange': { w:8, op:1, style:'gradient', c1:'#ff9a9e', c2:'#fecfef' },
+      'Monochrome Tech': { w:10, op:1, style:'split', c1:'#333333', c2:'#aaaaaa' },
+      'Gold Split': { w:8, op:1, style:'split', c1:'#ffd700', c2:'#b8860b' }
+    };
+
+    function initBorderPresets() {
+      const stored = localStorage.getItem('suiBorderPresetsV5');
+      borderPresets = stored ? JSON.parse(stored) : defaultBorderPresets;
+      updatePresetDropdown();
+    }
+    function updatePresetDropdown() {
+      const sel = document.getElementById('br-preset-sel'); sel.innerHTML = '<option value="">Presets...</option>';
+      Object.keys(borderPresets).forEach(k => { sel.innerHTML += `<option value="${k}">${k}</option>`; });
+    }
+    function saveBorderPreset() {
+      const name = prompt("Name this preset:"); if(!name) return;
+      borderPresets[name] = { w: state.brW, op: state.brOp, style: state.brStyle, c1: state.brC1, c2: state.brC2 };
+      localStorage.setItem('suiBorderPresetsV5', JSON.stringify(borderPresets)); updatePresetDropdown(); alert("Saved!");
+    }
+    function loadBorderPreset() {
+      saveHistory(); const p = borderPresets[document.getElementById('br-preset-sel').value]; if(!p) return;
+      state.brW = p.w; state.brOp = p.op; state.brStyle = p.style; state.brC1 = p.c1; state.brC2 = p.c2; 
+      fullRender(true); pubnub.publish({ channel: 'sui_v5_channel', message: state });
+    }
+    function deleteBorderPreset() {
+      const n = document.getElementById('br-preset-sel').value; if(!n || !confirm(`Delete ${n}?`)) return;
+      delete borderPresets[n]; localStorage.setItem('suiBorderPresetsV5', JSON.stringify(borderPresets)); updatePresetDropdown();
+    }
+
+    let savedLayouts = {}; let currentLayoutName = "Default";
+    function generateBaseLayouts() {
+      const b = JSON.parse(initialStateStr); 
+      const out = { "Default": JSON.parse(JSON.stringify(b)) };
+      
+      const sizes = [
+        { name: "Small", sf: 0.8 },
+        { name: "Regular", sf: 1.0 },
+        { name: "Large", sf: 1.25 }
+      ];
+
+      const applyScale = (layout, sf) => {
+        layout.agScale = sf;
+        layout.aglScale = sf;
+        layout.clpScale = sf;
+        layout.lssScale = sf;
+        layout.tgtScale = sf;
+        layout.tkH = Math.round(40 * sf);
+        layout.tkF = Math.round(22 * sf);
+        layout.nameplates.forEach(np => np.scale = sf);
+        return layout;
+      };
+
+      sizes.forEach(s => {
+        // Midnight Blue
+        let m = JSON.parse(initialStateStr);
+        m.agR1Bg1="#0f172a"; m.agR1Bg2="#1e3a8a"; m.aglC1="#0f172a"; m.aglC2="#1e3a8a"; m.clpC1="#0f172a"; m.clpC2="#1e3a8a"; m.tkC1="#0f172a"; m.tkC2="#1e3a8a"; m.lssC1="#0f172a"; m.lssC2="#1e3a8a"; m.tgtC1="#0f172a"; m.tgtC2="#1e3a8a";
+        m.nameplates.forEach(n=>{n.c1="#0f172a"; n.c2="#1e3a8a"; n.titleBg1="#0f172a"; n.titleBg2="#0f172a";});
+        out[`Midnight Blue ${s.name}`] = applyScale(m, s.sf);
+        
+        // Cyberpunk
+        let c = JSON.parse(initialStateStr);
+        c.ffAg="'Teko', sans-serif"; c.ffTk="'Teko', sans-serif"; c.ffL3="'Teko', sans-serif";
+        c.agR1Bg1="#9333ea"; c.agR1Bg2="#db2777"; c.aglC1="#9333ea"; c.aglC2="#db2777"; c.clpC1="#9333ea"; c.clpC2="#db2777"; c.tkC1="#9333ea"; c.tkC2="#db2777"; c.lssC1="#9333ea"; c.lssC2="#db2777"; c.tgtC1="#9333ea"; c.tgtC2="#db2777";
+        c.nameplates.forEach(n=>{n.c1="#9333ea"; n.c2="#db2777"; n.titleBg1="#9333ea"; n.titleBg2="#db2777";});
+        out[`Cyberpunk ${s.name}`] = applyScale(c, s.sf);
+
+        // Toxic Green
+        let tg = JSON.parse(initialStateStr);
+        tg.agR1Bg1="#14532d"; tg.agR1Bg2="#22c55e"; tg.aglC1="#14532d"; tg.aglC2="#22c55e"; tg.clpC1="#14532d"; tg.clpC2="#22c55e"; tg.tkC1="#14532d"; tg.tkC2="#22c55e"; tg.lssC1="#14532d"; tg.lssC2="#22c55e"; tg.tgtC1="#14532d"; tg.tgtC2="#22c55e";
+        tg.nameplates.forEach(n=>{n.c1="#14532d"; n.c2="#22c55e"; n.titleBg1="#14532d"; n.titleBg2="#22c55e";});
+        out[`Toxic Green ${s.name}`] = applyScale(tg, s.sf);
+
+        // Monochrome White
+        let min = JSON.parse(initialStateStr);
+        min.agR1Style="solid"; min.agR1Bg1="#ffffff"; min.agR1C="#000000"; min.aglStyle="solid"; min.aglC1="#ffffff"; min.aglTxtC="#000000"; min.clpStyle="solid"; min.clpC1="#ffffff"; min.clpTxtC="#000000"; min.tkStyle="solid"; min.tkC1="#ffffff"; min.tkTxtC="#000000"; min.lssStyle="solid"; min.lssC1="#ffffff"; min.lssTxtC="#000000"; min.tgtStyle="solid"; min.tgtC1="#ffffff"; min.tgtC2="#ffffff";
+        min.nameplates.forEach(n=>{n.style="solid"; n.c1="#ffffff"; n.txtNameC="#000000"; n.titleStyle="solid"; n.titleBg1="#ffffff"; n.txtTitleC="#000000";});
+        out[`Monochrome White ${s.name}`] = applyScale(min, s.sf);
+
+        // Synthwave Multicolor
+        let syn = JSON.parse(initialStateStr);
+        syn.agR1Bg1="#ff007f"; syn.agR1Bg2="#7928ca"; syn.agB2Bg1="#00f2fe"; syn.agB2Bg2="#4facfe"; syn.agB3Bg1="#f59e0b"; syn.agB3Bg2="#ea580c"; syn.aglC1="#1e3a8a"; syn.aglC2="#9333ea"; syn.clpC1="#1e3a8a"; syn.clpC2="#9333ea"; syn.tkC1="#f59e0b"; syn.tkC2="#ea580c"; syn.lssC1="#10b981"; syn.lssC2="#047857"; syn.tgtC1="#8b5cf6"; syn.tgtC2="#3b82f6";
+        syn.nameplates.forEach(n=>{n.c1="#ff007f"; n.c2="#f59e0b"; n.titleBg1="#00f2fe"; n.titleBg2="#4facfe"; n.txtTitleC="#000000";});
+        out[`Synthwave Multicolor ${s.name}`] = applyScale(syn, s.sf);
+        
+        // SUI Core (Red & Gold)
+        let sui = JSON.parse(initialStateStr);
+        out[`SUI Core ${s.name}`] = applyScale(sui, s.sf);
+      });
+
+      return out;
+    }
+    
+    function initLayouts() {
+      initialStateStr = JSON.stringify(state);
+      
+      const stored = localStorage.getItem('suiDiscLayoutsV5');
+      if(stored) savedLayouts = JSON.parse(stored); 
+      else { 
+        savedLayouts = generateBaseLayouts(); 
+        localStorage.setItem('suiDiscLayoutsV5', JSON.stringify(savedLayouts)); 
+      }
+      
+      const last = localStorage.getItem('suiLastDiscLayoutV5');
+      if(last && savedLayouts[last]) executeLoad(last); else executeLoad("Default");
+    }
+    
+    function saveLayout() { 
+      document.getElementById('modal-bg').style.display = 'block'; 
+      document.getElementById('save-warning-modal').style.display = 'block'; 
+    }
+
+    function confirmSaveLayout() {
+      savedLayouts[currentLayoutName] = JSON.parse(JSON.stringify(state)); 
+      localStorage.setItem('suiDiscLayoutsV5', JSON.stringify(savedLayouts)); 
+      closeModals();
+      alert("Layout Saved!"); 
+    }
+
+    function saveLayoutAs() {
+      const n = prompt("Layout Name:", "My Set"); if(!n) return;
+      currentLayoutName = n.trim(); savedLayouts[currentLayoutName] = JSON.parse(JSON.stringify(state));
+      localStorage.setItem('suiDiscLayoutsV5', JSON.stringify(savedLayouts)); localStorage.setItem('suiLastDiscLayoutV5', currentLayoutName);
+      document.getElementById('current-layout-badge').textContent = `Layout: ${currentLayoutName}`; alert("Saved as: " + currentLayoutName);
+    }
+
+    function executeLoad(name) {
+      if(!savedLayouts[name]) return;
+      saveHistory(); currentLayoutName = name; localStorage.setItem('suiLastDiscLayoutV5', name);
+      if(!isOverlay) document.getElementById('current-layout-badge').textContent = `Layout: ${name}`;
+      
+      const loaded = JSON.parse(JSON.stringify(savedLayouts[name]));
+      
+      // Preserve existing content and visibilities, apply ONLY styles from preset
+      const newState = { ...state };
+      
+      const styleKeys = [
+        'agScale', 'ffAg', 'agR1F', 'agR1C', 'agR1Style', 'agR1Bg1', 'agR1Bg2',
+        'agR2F', 'agR2C', 'agR2Style', 'agR2Bg1', 'agR2Bg2', 'agB2C', 'agB2Style', 'agB2Bg1', 'agB2Bg2',
+        'agR3F', 'agR3C', 'agR3Style', 'agR3Bg1', 'agR3Bg2', 'agB3C', 'agB3Style', 'agB3Bg1', 'agB3Bg2',
+        'aglScale', 'aglTxtC', 'aglStyle', 'aglC1', 'aglC2',
+        'clpScale', 'clpTxtC', 'clpStyle', 'clpC1', 'clpC2', 
+        'ffL3', 'l3FName', 'l3FTitle', 
+        'lssScale', 'lssTxtC', 'lssStyle', 'lssC1', 'lssC2',
+        'ffTk', 'tkF', 'tkTxtC', 'tkH', 'tkOp', 'tkStyle', 'tkC1', 'tkC2',
+        'brW', 'brOp', 'brStyle', 'brC1', 'brC2',
+        'tgtScale', 'ffTgtLbl', 'fTgtLbl', 'ffTgtVal', 'fTgtVal', 'tgtStyle', 'tgtC1', 'tgtC2'
+      ];
+      
+      styleKeys.forEach(k => { if(loaded[k] !== undefined) newState[k] = loaded[k]; });
+
+      if (loaded.nameplates && loaded.nameplates.length > 0 && newState.nameplates.length > 0) {
+        const pStyle = loaded.nameplates[0];
+        newState.nameplates = newState.nameplates.map(np => ({
+          ...np, scale: pStyle.scale, style: pStyle.style, c1: pStyle.c1, c2: pStyle.c2, txtNameC: pStyle.txtNameC, txtTitleC: pStyle.txtTitleC, titleStyle: pStyle.titleStyle, titleBg1: pStyle.titleBg1, titleBg2: pStyle.titleBg2
+        }));
+      }
+
+      state = newState;
+      fullRender(true); closeModals();
+    }
+    
+    function renderLayoutList() { document.getElementById('layout-list').innerHTML = Object.keys(savedLayouts).map(n => `<div class="list-item-row"><span>${n}</span> <button class="ctrl-btn highlight" onclick="executeLoad('${n}')">Load</button></div>`).join(''); }
+
+    if(!isOverlay) { initBorderPresets(); initLayouts(); }
+  </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sports Unplugged India | Live Discussion Suite V5.0</title>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Fira+Sans:wght@400;700&family=Inter:wght@400;700;800&family=Lato:wght@400;700;900&family=Merriweather:wght@400;700;900&family=Montserrat:wght@400;600;700;800&family=Nunito:wght@400;700;800&family=Open+Sans:wght@400;700;800&family=Oswald:wght@400;700&family=PT+Sans:wght@400;700&family=Playfair+Display:wght@400;700;800&family=Poppins:wght@400;700;800&family=Raleway:wght@400;700;800&family=Roboto:wght@400;700;900&family=Rubik:wght@400;700;800&family=Teko:wght@400;600;700&family=Ubuntu:wght@400;700&family=Work+Sans:wght@400;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.pubnub.com/sdk/javascript/pubnub.7.2.2.min.js"></script>
+  <style>
+    :root {
+      --target-scale: 1; --ff-tgt-lbl: 'Montserrat', sans-serif; --f-tgt-label: 13px; --ff-tgt-val: 'Teko', sans-serif; --f-tgt-val: 30px;
+      --tk-h: 40px; --ff-tk: 'Montserrat', sans-serif; --tk-f: 22px; --tk-op: 0.9; --tk-txt-c: #ffffff;
+      
+      --ag-scale: 1; --ff-ag: 'Montserrat', sans-serif;
+      --ag-r1-f: 24px; --ag-r1-c: #ffffff; --ag-r1-bg: #111;
+      --ag-r2-f: 18px; --ag-r2-c: #ffffff; --ag-r2-bg: #111; --ag-b2-c: #111; --ag-b2-bg: #ffd700;
+      --ag-r3-f: 16px; --ag-r3-c: #aaaaaa; --ag-r3-bg: #111; --ag-b3-c: #fff; --ag-b3-bg: #3b82f6;
+
+      --ff-l3: 'Montserrat', sans-serif;
+      --l3-f-name: 26px; --l3-f-title: 14px;
+      
+      --br-w: 8px; --br-op: 1; --br-style: linear-gradient(135deg, #d31122 0%, #f6b200 100%);
+      
+      --lss-scale: 1; --lss-x: 50%; --lss-y: 20%; --lss-bg: linear-gradient(90deg, #ff0000 0%, #cc0000 100%); --lss-txt: #ffffff;
+      
+      --agl-scale: 1; --agl-x: 80%; --agl-y: 50%; --agl-bg: linear-gradient(135deg, #111 0%, #222 100%); --agl-txt: #ffffff;
+      
+      /* Custom List Variables */
+      --clp-scale: 1; --clp-x: 20%; --clp-y: 50%; --clp-bg: linear-gradient(135deg, #111 0%, #222 100%); --clp-txt: #ffffff;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+    html, body { background-color: transparent !important; background-image: none !important; font-family: 'Montserrat', sans-serif; overflow: hidden; width: 100vw; height: 100vh; position: relative; }
+    img[src=""], img:not([src]) { display: none !important; }
+    .font-dropdown, .font-select { background: #222; color: #ccc; border: 1px solid #555; border-radius: 4px; padding: 2px 4px; width: 90px; font-family: 'Montserrat', sans-serif; cursor: pointer; outline: none; font-size: 11px; font-weight: bold; }
+
+    /* BORDERS */
+    .cam-frame { position: absolute; display: none; aspect-ratio: 16/9; pointer-events: none; border: var(--br-w) solid; border-image: var(--br-style) 1; opacity: var(--br-op); z-index: 1; box-shadow: inset 0 0 20px rgba(0,0,0,0.5), 0 0 20px rgba(0,0,0,0.5); }
+    #global-frame { left: 0; top: 0; width: 100vw; height: 100vh; z-index: 99; border-width: var(--br-w); }
+
+    /* WIDGETS */
+    .sub-count-wrapper { position: absolute; left: 20px; top: 20px; height: 100px; width: 380px; background: rgba(12, 14, 18, 0.95); border-radius: 8px; border: 2px solid rgba(255, 255, 255, 0.18); box-shadow: 0 8px 24px rgba(0,0,0,0.85); overflow: hidden; z-index: 5; }
+    .sub-count-wrapper iframe { width: 100%; height: 100%; border: none; overflow: hidden; }
+    .targets-wrapper { position: absolute; right: 20px; top: 20px; height: 100px; border-radius: 8px; border: 2px solid rgba(255, 255, 255, 0.25); z-index: 5; box-shadow: 0 8px 24px rgba(0,0,0,0.85); display: flex; flex-direction: column; justify-content: center; padding: 0 24px; gap: 12px; min-width: 260px; transform: scale(var(--target-scale)); transform-origin: top right; transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
+    .target-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 4px; }
+    .target-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .target-label { color: #e2e8f0; font-family: var(--ff-tgt-lbl); font-size: var(--f-tgt-label); letter-spacing: 1.5px; text-transform: uppercase; font-weight: 800; }
+    .target-value { color: #ffd700; font-family: var(--ff-tgt-val); font-size: var(--f-tgt-val); line-height: 0.8; font-weight: 700; text-shadow: 1px 1px 3px rgba(0,0,0,0.9); }
+
+    .ticker-wrapper { position: absolute; bottom: 0; left: 0; width: 100vw; height: var(--tk-h); display: flex; align-items: center; overflow: hidden; z-index: 50; box-shadow: 0 -4px 12px rgba(0,0,0,0.6); transition: height 0.3s; }
+    .ticker-bg { position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: var(--tk-op); z-index: 1; transition: opacity 0.2s, background 0.3s; }
+    .ticker-content { position: relative; z-index: 2; width: 100%; }
+    .ticker-text { color: var(--tk-txt-c); font-family: var(--ff-tk); font-size: var(--tk-f); font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; text-shadow: 1px 1px 3px rgba(0,0,0,0.9); white-space: nowrap; }
+    .ticker-text.scrolling { display: inline-block; padding-left: 100vw; animation: ticker-scroll 25s linear infinite; }
+    .ticker-text.static { display: block; width: 100%; text-align: center; padding-left: 0; animation: none; }
+    @keyframes ticker-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+    @keyframes pulse { from { opacity: 0.3; } to { opacity: 1; } }
+
+    /* AGENDA TRACKER (3 ROWS) */
+    .agenda-wrapper { position: absolute; top: 20px; left: 50%; transform: translateX(-50%) scale(var(--ag-scale)); transform-origin: top center; z-index: 10; display: flex; flex-direction: column; align-items: stretch; border-radius: 8px; border: 2px solid rgba(255, 255, 255, 0.25); box-shadow: 0 8px 24px rgba(0,0,0,0.85); overflow: hidden; min-width: 500px; }
+    .ag-row { display: flex; align-items: center; font-family: var(--ff-ag); transition: background 0.3s, color 0.3s, font-size 0.2s; }
+    #ag-row-1 { padding: 8px 20px; justify-content: center; font-size: var(--ag-r1-f); color: var(--ag-r1-c); background: var(--ag-r1-bg); font-weight: 900; text-transform: uppercase; letter-spacing: 1.5px; text-shadow: 1px 1px 3px rgba(0,0,0,0.9); }
+    #ag-row-2 { background: var(--ag-r2-bg); }
+    #ag-row-3 { background: var(--ag-r3-bg); }
+    .ag-badge { font-weight: 900; text-transform: uppercase; letter-spacing: 1px; padding: 6px 14px; white-space: nowrap; }
+    #ag-badge-2 { background: var(--ag-b2-bg); color: var(--ag-b2-c); font-size: calc(var(--ag-r2-f) - 3px); }
+    #ag-badge-3 { background: var(--ag-b3-bg); color: var(--ag-b3-c); font-size: calc(var(--ag-r3-f) - 3px); }
+    .ag-text { font-weight: 700; padding: 6px 16px; white-space: nowrap; text-transform: uppercase; width: 100%; }
+    #ag-text-2 { font-size: var(--ag-r2-f); color: var(--ag-r2-c); }
+    #ag-text-3 { font-size: var(--ag-r3-f); color: var(--ag-r3-c); }
+
+    /* MULTIPLE DRAGGABLE NAMEPLATES */
+    .nameplate-wrapper { position: absolute; transform: translate(-50%, -50%); display: flex; flex-direction: column; z-index: 20; border-radius: 8px; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.25); box-shadow: 0 8px 24px rgba(0,0,0,0.85); cursor: grab; }
+    .nameplate-wrapper:active { cursor: grabbing; }
+    .np-top { padding: 10px 24px; font-family: var(--ff-l3); font-size: var(--l3-f-name); font-weight: 900; text-transform: uppercase; letter-spacing: 1.5px; text-shadow: 1px 1px 4px rgba(0,0,0,0.9); white-space: nowrap; }
+    .np-bottom { padding: 6px 24px; font-family: var(--ff-l3); font-size: var(--l3-f-title); font-weight: 700; text-transform: uppercase; letter-spacing: 2px; white-space: nowrap; }
+
+    /* VERTICAL AGENDA LIST PANEL (WITH AUTO SORTING & INDICATORS) */
+    .agenda-list-wrapper { position: absolute; left: var(--agl-x); top: var(--agl-y); transform: translate(-50%, -50%) scale(var(--agl-scale)); z-index: 15; display: flex; flex-direction: column; border-radius: 8px; border: 2px solid rgba(255, 255, 255, 0.25); box-shadow: 0 8px 24px rgba(0,0,0,0.85); overflow: hidden; min-width: 320px; cursor: grab; background: var(--agl-bg); }
+    .agenda-list-wrapper:active { cursor: grabbing; }
+    .agl-header { background: rgba(0,0,0,0.6); color: var(--agl-txt); padding: 12px; font-family: var(--ff-ag); font-size: 20px; font-weight: 900; text-align: center; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 2px solid rgba(255,255,255,0.2); }
+    .agl-body { display: flex; flex-direction: column; padding: 12px; gap: 8px; }
+    .agl-item { color: var(--agl-txt); font-family: var(--ff-ag); font-size: 16px; font-weight: 700; text-transform: uppercase; padding: 8px 12px; border-left: 4px solid transparent; background: rgba(0,0,0,0.2); transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); border-radius: 0 4px 4px 0; display: flex; align-items: center; gap: 8px; }
+    .agl-item.status-now { border-left-color: #ffd700; background: rgba(255, 215, 0, 0.2); color: #ffd700; transform: scale(1.02); box-shadow: 0 4px 10px rgba(0,0,0,0.3); text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 2px 2px 4px rgba(0,0,0,0.8); }
+    .agl-item.status-next { border-left-color: #3b82f6; background: rgba(59, 130, 246, 0.2); color: #60a5fa; text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 2px 2px 4px rgba(0,0,0,0.8); }
+    .agl-item.status-completed { border-left-color: #10b981; opacity: 0.55; }
+    .ag-live-bulb { width: 10px; height: 10px; border-radius: 50%; background: #ef4444; box-shadow: 0 0 8px #ef4444; animation: pulse 1s infinite alternate; flex-shrink: 0; }
+    .ag-up-next { font-size: 10px; background: #3b82f6; color: #fff; padding: 2px 6px; border-radius: 4px; margin-left: auto; animation: pulse 1s infinite alternate; font-weight: 900; letter-spacing: 1px; flex-shrink: 0; text-shadow: none; box-shadow: 0 0 5px rgba(0,0,0,0.5); }
+    .ag-completed { color: #10b981; font-weight: 900; margin-left: auto; font-size: 16px; flex-shrink: 0; text-shadow: none; }
+
+    /* CUSTOM VERTICAL LIST PANEL */
+    .custom-list-wrapper { position: absolute; left: var(--clp-x); top: var(--clp-y); transform: translate(-50%, -50%) scale(var(--clp-scale)); z-index: 16; display: flex; flex-direction: column; border-radius: 8px; border: 2px solid rgba(255, 255, 255, 0.25); box-shadow: 0 8px 24px rgba(0,0,0,0.85); overflow: hidden; min-width: 300px; cursor: grab; background: var(--clp-bg); }
+    .custom-list-wrapper:active { cursor: grabbing; }
+    .clp-header { background: rgba(0,0,0,0.6); color: var(--clp-txt); padding: 12px; font-family: var(--ff-ag); font-size: 20px; font-weight: 900; text-align: center; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 2px solid rgba(255,255,255,0.2); }
+    .clp-body { display: flex; flex-direction: column; padding: 12px; gap: 8px; }
+    .clp-item { color: var(--clp-txt); font-family: var(--ff-ag); font-size: 16px; font-weight: 700; text-transform: uppercase; padding: 8px 12px; border-left: 4px solid transparent; background: rgba(0,0,0,0.2); transition: all 0.2s; border-radius: 0 4px 4px 0; }
+    .clp-item.highlighted { transform: scale(1.02); box-shadow: 0 4px 10px rgba(0,0,0,0.3); text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 2px 2px 4px rgba(0,0,0,0.8); }
+
+    /* LSS WIDGET */
+    .lss-wrapper { position: absolute; left: var(--lss-x); top: var(--lss-y); transform: translate(-50%, -50%) scale(var(--lss-scale)); background: var(--lss-bg); border-radius: 30px; padding: 12px 30px; color: var(--lss-txt); font-family: 'Montserrat', sans-serif; font-size: 20px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 2px solid rgba(255,255,255,0.3); display: flex; gap: 15px; align-items: center; z-index: 90; cursor: grab; }
+    .lss-wrapper:active { cursor: grabbing; }
+    .lss-icon { font-size: 24px; }
+    .lss-animated { animation: lss-pulse 2s infinite cubic-bezier(0.4, 0, 0.6, 1); }
+    @keyframes lss-pulse { 0%, 100% { transform: translate(-50%, -50%) scale(var(--lss-scale)); } 50% { transform: translate(-50%, -50%) scale(calc(var(--lss-scale) * 1.05)); } }
+
+    /* CONTROLLER PANEL */
+    .controller-panel { position: absolute; top: 60px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; background: rgba(16, 20, 26, 0.95); padding: 20px; border-radius: 12px; border: 2px solid #333; width: 1150px; color: #fff; max-height: calc(100vh - 80px); z-index: 1000; box-shadow: 0 20px 50px rgba(0,0,0,0.9); transition: width 0.3s ease; }
+    .controls-body { overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 8px; }
+    .ctrl-master-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 16px; border-bottom: 2px solid #333; margin-bottom: 16px; position: sticky; top: -20px; background: rgba(16, 20, 26, 0.95); z-index: 10; cursor: grab; }
+    .ctrl-master-header:active { cursor: grabbing; }
+    .layout-name-badge { background: #333; padding: 4px 10px; border-radius: 4px; font-size: 12px; color: #aaa; margin-left: 10px; font-weight: bold; pointer-events: none; }
+    .collapsible-header { background: #1e242d; color: #fff; padding: 14px 18px; cursor: pointer; font-weight: 800; font-family: 'Montserrat', sans-serif; letter-spacing: 1px; border: 1px solid #444; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; text-transform: uppercase; margin-bottom: 4px; transition: background 0.2s; }
+    .collapsible-header:hover { background: #2a323d; }
+    .collapsible-content { display: none; padding: 20px; background: rgba(0, 0, 0, 0.2); border: 1px solid #444; border-top: none; border-radius: 0 0 6px 6px; flex-direction: column; gap: 16px; margin-top: -8px; margin-bottom: 12px; }
+    .collapsible-content.active { display: flex; }
+    .ctrl-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-start; align-items: center; }
+    .sub-panel { background: rgba(0,0,0,0.4); padding: 16px; border-radius: 8px; border: 1px solid #333; margin-bottom: 12px; width: 100%; }
+    .ctrl-btn { background: #2b323c; color: #eee; border: 1px solid #555; padding: 8px 16px; font-size: 13px; font-weight: bold; border-radius: 6px; cursor: pointer; transition: background 0.2s, transform 0.1s; }
+    .ctrl-btn:hover { background: #3b4451; }
+    .ctrl-btn.highlight { background: #1a4d2e; border-color: #277144; color: #fff; }
+    .ctrl-btn.warning { background: #8a2b2b; border-color: #a63a3a; color: #fff; }
+    .ctrl-btn.special { background: #2563eb; border-color: #1d4ed8; color: #fff; }
+    .ctrl-btn.sync-btn { background: #eab308; border-color: #ca8a04; color: #000; font-size: 15px; padding: 10px 24px; box-shadow: 0 4px 10px rgba(234, 179, 8, 0.3); }
+    .slider-group { display: flex; gap: 20px; flex-wrap: wrap; justify-content: flex-start; }
+    .slider-container { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 11px; color: #ccc; font-weight: bold; text-transform: uppercase; }
+    .slider-container input[type="range"] { width: 80px; cursor: pointer; accent-color: #eab308; }
+    .slider-container input[type="color"] { border: 1px solid #555; border-radius: 4px; width: 34px; height: 34px; cursor: pointer; background: #222; padding:0; }
+    input.auto-text { padding: 8px 12px; border-radius: 4px; border: 1px solid #555; background: #222; color: #fff; font-family: 'Montserrat', sans-serif; font-weight: bold; font-size: 14px; width: 100%; }
+    input.auto-text:focus { outline: 2px solid #eab308; border-color: transparent; }
+    .section-title { font-size: 13px; color: #ffd700; font-weight: 800; text-transform: uppercase; width: 100%; text-align: left; margin-bottom: 8px; letter-spacing: 1px; display: block; border-bottom: 1px solid #444; padding-bottom: 6px; }
+
+    /* Drag Hint Overlay */
+    #drag-hint { position: absolute; left: 50%; top: 10%; transform: translateX(-50%); background: rgba(234, 179, 8, 0.9); color: #000; padding: 10px 20px; border-radius: 20px; font-size: 14px; font-weight: 900; display: none; pointer-events: none; z-index: 10000; box-shadow: 0 5px 15px rgba(0,0,0,0.5); text-transform: uppercase; }
+
+    /* Modals */
+    .modal-bg { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); z-index: 9999; }
+    .modal-content { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #161b22; border: 2px solid #30363d; z-index: 10000; padding: 24px; border-radius: 8px; color: #fff; box-shadow: 0 20px 50px rgba(0,0,0,0.9); }
+    .list-item-row { padding: 10px 12px; border-bottom: 1px solid #30363d; display: flex; justify-content: space-between; align-items: center; transition: background 0.2s; }
+    .list-item-row:hover { background: #21262d; }
+    .list-item-row:last-child { border-bottom: none; }
+  </style>
+</head>
+<body>
+
+  <script>
+    const fontOptions = `
+      <option value="'Montserrat', sans-serif">Montserrat</option><option value="'Teko', sans-serif">Teko</option>
+      <option value="'Roboto', sans-serif">Roboto</option><option value="'Bebas Neue', sans-serif">Bebas Neue</option>
+      <option value="'Oswald', sans-serif">Oswald</option><option value="'Anton', sans-serif">Anton</option>
+      <option value="'Poppins', sans-serif">Poppins</option><option value="'Lato', sans-serif">Lato</option>
+      <option value="'Open Sans', sans-serif">Open Sans</option><option value="'Raleway', sans-serif">Raleway</option>
+      <option value="'Ubuntu', sans-serif">Ubuntu</option><option value="'PT Sans', sans-serif">PT Sans</option>
+      <option value="'Merriweather', serif">Merriweather</option><option value="'Playfair Display', serif">Playfair Display</option>
+      <option value="'Rubik', sans-serif">Rubik</option><option value="'Work Sans', sans-serif">Work Sans</option>
+      <option value="'Nunito', sans-serif">Nunito</option><option value="'Fira Sans', sans-serif">Fira Sans</option>
+      <option value="'Inter', sans-serif">Inter</option>
+    `;
+  </script>
+
+  <!-- MODALS -->
+  <div class="modal-bg" id="modal-bg" onclick="closeModals()"></div>
+  <div class="modal-content" id="layout-modal" style="width: 450px;">
+    <h3 style="margin-bottom: 15px; color: #ffd700; text-transform: uppercase;">Load Layout Preset</h3>
+    <div id="layout-list" style="max-height: 350px; overflow-y: auto; border: 1px solid #30363d; border-radius: 4px; background: #0d1117;"></div>
+    <div style="display: flex; justify-content: flex-end; margin-top: 20px;"><button class="ctrl-btn" onclick="closeModals()">Cancel</button></div>
+  </div>
+
+  <div class="modal-content" id="manual-modal" style="width: 800px; max-height: 85vh; overflow-y: auto; font-family: 'Montserrat', sans-serif;">
+    <h2 style="color: #ffd700; text-transform: uppercase; letter-spacing: 1px; border-bottom: 2px solid #30363d; padding-bottom: 10px; margin-bottom: 20px;">Live Discussion Suite V5.0 | Manual</h2>
+    <div style="line-height: 1.6; font-size: 14px;">
+      <p style="margin-bottom: 20px;">Welcome to the <strong>Ultimate Broadcast Overlay</strong>. This highly customizable, real-time sports graphic suite runs entirely in your browser.</p>
+      
+      <h3 style="color: #4ade80; border-bottom: 1px solid #30363d; padding-bottom: 5px;">I. System Setup & Views</h3>
+      <ul style="margin-left: 20px; margin-bottom: 15px; margin-top: 5px;">
+        <li><strong>Control Panel (Your Screen):</strong> Open the main HTML file normally in your web browser.</li>
+        <li><strong>Live Overlay (Audience Screen):</strong> In OBS/vMix, add this HTML file as a <strong>Browser Source</strong> and append <code>?view=overlay</code> to the end of the file path. The control panel will hide, leaving only transparent graphics.</li>
+      </ul>
+
+      <h3 style="color: #4ade80; margin-top: 20px; border-bottom: 1px solid #30363d; padding-bottom: 5px;">II. Dynamic Interaction & Syncing</h3>
+      <ul style="margin-left: 20px; margin-bottom: 15px; margin-top: 5px;">
+        <li><strong>Instant Actions:</strong> Typing in text boxes, clicking "Set Now/Next", and toggling visibility checkboxes update immediately on stream.</li>
+        <li><strong>Draft Actions (Requires SYNC):</strong> Changing fonts, sizes, and colors preview locally in real-time as you drag the sliders. Click <strong>"SYNC TO STREAM"</strong> to push them live to your audience.</li>
+        <li><strong>Click & Drag:</strong> You can click and drag the Vertical Agenda Panels, the Guest Nameplates, and the LSS Widget anywhere on the screen. The position automatically syncs.</li>
+      </ul>
+
+      <h3 style="color: #4ade80; margin-top: 20px; border-bottom: 1px solid #30363d; padding-bottom: 5px;">III. Features</h3>
+      <ul style="margin-left: 20px; margin-bottom: 15px;">
+        <li><strong>Agenda Tracker:</strong> 3-Row board. You can customize the background for the entire row *and* independently style the "Discussing Now" / "Up Next" badges.</li>
+        <li><strong>Vertical Agenda Panel (Linked & Auto-Sorting):</strong> Build your run-of-show list here. Clicking "Set Now", "Set Next", or "Mark Done" automatically sorts the list and pushes the text directly to the top Agenda Tracker. The Live item jumps to the top, upcoming items tuck underneath, and completed items drop to the bottom with a green checkmark!</li>
+        <li><strong>Custom Vertical List (Free Text):</strong> An independent list panel perfect for displaying "Team Strengths" or "Weaknesses". You can freely highlight multiple rows at the same time using a custom color picker for each row.</li>
+        <li><strong>Guest Nameplates:</strong> Add unlimited guests. Drag them into position under your webcams. Each guest has completely independent styling for their name and title backgrounds.</li>
+        <li><strong>Border Presets:</strong> Quickly snap professional camera borders. We've pre-loaded 10 themes, but you can create and save your own.</li>
+        <li><strong>Undo/Redo/Reset:</strong> Made a mistake? Use Undo/Redo at the top. Reset wipes all unsaved changes and returns to your launch state.</li>
+        <li><strong>Global Layout Presets:</strong> 6 distinct themes (Cyberpunk, Minimalist, Sunset, etc.) available in 3 sizes each (Small, Regular, Large). Loading these recolors the ENTIRE broadcast suite.</li>
+      </ul>
+    </div>
+    <div style="display: flex; justify-content: flex-end; margin-top: 25px; border-top: 1px solid #30363d; padding-top: 15px;">
+      <button class="ctrl-btn highlight" onclick="closeModals()" style="font-size: 14px; padding: 8px 24px;">Got it, Close Manual</button>
+    </div>
+  </div>
+
+  <div class="modal-content" id="save-warning-modal" style="text-align: center; width: 350px;">
+    <h3 style="color: #ff3344; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px;">Warning</h3>
+    <p style="margin-bottom: 25px; font-size: 15px; line-height: 1.5;">This will overwrite the current layout. Are you sure you want to save?</p>
+    <div style="display: flex; justify-content: center; gap: 15px;">
+      <button class="ctrl-btn highlight" onclick="confirmSaveLayout()">Save</button>
+      <button class="ctrl-btn" onclick="closeModals()">Cancel</button>
+    </div>
+  </div>
+
+  <div id="drag-hint">DRAGGING ELEMENT...</div>
+
+  <!-- OVERLAY RENDER CONTAINERS -->
+  <div class="cam-frame" id="global-frame"></div>
+  <div class="sub-count-wrapper"><iframe src="https://socialcounts.org/youtube-live-subscriber-count/UC6HP5_0MxNjZddNg9_t47gg/embed" allowtransparency="true" frameborder="0" scrolling="no"></iframe></div>
+
+  <div class="targets-wrapper" id="targets-wrapper">
+    <div class="target-row"><span class="target-label">Like Target</span><span class="target-value" id="like-target-display">25</span></div>
+    <div class="target-row"><span class="target-label">Sub Target</span><span class="target-value" id="sub-target-display">900</span></div>
+  </div>
+
+  <!-- Agenda Tracker Board -->
+  <div class="agenda-wrapper" id="agenda-wrapper">
+    <div class="ag-row" id="ag-row-1">Sports Unplugged India | Live Discussion</div>
+    <div class="ag-row" id="ag-row-2"><span class="ag-badge" id="ag-badge-2">DISCUSSING NOW</span><span class="ag-text" id="ag-text-2">Pre-Match Build Up</span></div>
+    <div class="ag-row" id="ag-row-3"><span class="ag-badge" id="ag-badge-3">UP NEXT</span><span class="ag-text" id="ag-text-3">East Bengal Tactical Breakdown</span></div>
+  </div>
+
+  <!-- Dynamic Render Containers -->
+  <div id="overlay-nameplates"></div>
+
+  <!-- Vertical Agenda List -->
+  <div class="agenda-list-wrapper" id="agl-wrapper" style="display:none;">
+    <div class="agl-header" id="agl-title-display">Today's Agenda</div>
+    <div class="agl-body" id="agl-list-render"></div>
+  </div>
+
+  <!-- New Custom Vertical List (Free Text) -->
+  <div class="custom-list-wrapper" id="clp-wrapper" style="display:none;">
+    <div class="clp-header" id="clp-title-display">Key Talking Points</div>
+    <div class="clp-body" id="clp-list-render"></div>
+  </div>
+
+  <div class="ticker-wrapper" id="ticker-wrapper">
+    <div class="ticker-bg" id="ticker-bg"></div>
+    <div class="ticker-content"><span class="ticker-text scrolling" id="ticker-text">Welcome to Sports Unplugged India! Please Like and Subscribe.</span></div>
+  </div>
+
+  <div class="lss-wrapper lss-animated" id="lss-widget">
+    <span class="lss-icon">👍</span> LIKE &nbsp;|&nbsp; <span class="lss-icon">🔗</span> SHARE &nbsp;|&nbsp; <span class="lss-icon">🔔</span> SUBSCRIBE
+  </div>
+
+  <!-- CONTROL PANEL -->
+  <div class="controller-panel" id="controls">
+    <div class="ctrl-master-header">
+      <div style="display: flex; align-items: center; pointer-events: none;">
+        <span style="font-weight: 900; font-size: 20px; color: #fff; letter-spacing: 1.5px;">SUI DISCUSSION SUITE V5.0</span>
+        <span class="layout-name-badge" id="current-layout-badge">Layout: Default</span>
+      </div>
+      <div style="display: flex; gap: 6px; pointer-events: auto;">
+        <button class="ctrl-btn special" onclick="openManual()">Manual</button>
+        <button class="ctrl-btn" onclick="undo()">Undo</button>
+        <button class="ctrl-btn" onclick="redo()">Redo</button>
+        <button class="ctrl-btn warning" onclick="reset()">Reset</button>
+        <button class="ctrl-btn sync-btn" onclick="syncVisuals()">SYNC TO STREAM</button>
+        <button class="ctrl-btn" onclick="saveLayout()">Save</button>
+        <button class="ctrl-btn" onclick="saveLayoutAs()">Save As</button>
+        <button class="ctrl-btn" onclick="openLayoutModal()">Load</button>
+        <button class="ctrl-btn special" id="btn-toggle-panel" onclick="togglePanelBody()">Minimize</button>
+      </div>
+    </div>
+
+    <div class="controls-body" id="controls-body">
+      
+      <!-- 1. AGENDA TRACKER -->
+      <div class="collapsible-header" onclick="togglePanel('panel-ag')">1. Agenda Tracker Board <span id="panel-ag-icon">▲</span></div>
+      <div class="collapsible-content active" id="panel-ag">
+        <div class="sub-panel">
+          <label style="display:flex; align-items:center; gap:8px; font-weight:bold; font-size:13px; margin-bottom:12px;">
+            <input type="checkbox" id="ctrl-ag-vis" checked onchange="applyInstant()"> Enable Agenda Tracker
+          </label>
+          <div style="display:flex; flex-direction:column; gap:16px;">
+            <!-- Row 1 -->
+            <div style="display:flex; gap:10px; align-items:center;">
+              <span class="section-title" style="margin:0; border:none; width:120px;">Top Header</span>
+              <input type="text" class="auto-text" id="ag-r1-txt" oninput="applyInstant()">
+              <input type="range" id="ag-r1-f" min="14" max="40" style="width:60px;" oninput="applyVisualsLocally()">
+              <input type="color" id="ag-r1-c" oninput="applyVisualsLocally()">
+              <select id="ag-r1-style" class="font-select" onchange="applyVisualsLocally()"><option value="solid">Solid</option><option value="split">Split</option><option value="gradient">Grad</option></select>
+              <input type="color" id="ag-r1-bg1" oninput="applyVisualsLocally()"> <input type="color" id="ag-r1-bg2" oninput="applyVisualsLocally()">
+            </div>
+            <!-- Row 2 -->
+            <div style="display:flex; gap:10px; align-items:center;">
+              <span class="section-title" style="margin:0; border:none; width:120px;">Discussing Now</span>
+              <input type="text" class="auto-text" id="ag-r2-txt" oninput="applyInstant()">
+              <input type="range" id="ag-r2-f" min="14" max="40" style="width:60px;" oninput="applyVisualsLocally()">
+              <input type="color" id="ag-r2-c" oninput="applyVisualsLocally()">
+              <select id="ag-r2-style" class="font-select" onchange="applyVisualsLocally()"><option value="solid">Solid</option><option value="split">Split</option><option value="gradient">Grad</option></select>
+              <input type="color" id="ag-r2-bg1" oninput="applyVisualsLocally()"> <input type="color" id="ag-r2-bg2" oninput="applyVisualsLocally()">
+            </div>
+            <div style="display:flex; gap:10px; align-items:center; background:rgba(0,0,0,0.2); padding:6px; border-radius:4px;">
+              <span style="font-size:11px; font-weight:bold; width:120px; color:#aaa;">Row 2 BADGE BG:</span>
+              <input type="color" id="ag-b2-c" oninput="applyVisualsLocally()" title="Badge Text Color">
+              <select id="ag-b2-style" class="font-select" onchange="applyVisualsLocally()"><option value="solid">Solid</option><option value="split">Split</option><option value="gradient">Grad</option></select>
+              <input type="color" id="ag-b2-bg1" oninput="applyVisualsLocally()"> <input type="color" id="ag-b2-bg2" oninput="applyVisualsLocally()">
+            </div>
+            <!-- Row 3 -->
+            <div style="display:flex; gap:10px; align-items:center;">
+              <span class="section-title" style="margin:0; border:none; width:120px;">Up Next</span>
+              <input type="text" class="auto-text" id="ag-r3-txt" oninput="applyInstant()">
+              <input type="range" id="ag-r3-f" min="12" max="30" style="width:60px;" oninput="applyVisualsLocally()">
+              <input type="color" id="ag-r3-c" oninput="applyVisualsLocally()">
+              <select id="ag-r3-style" class="font-select" onchange="applyVisualsLocally()"><option value="solid">Solid</option><option value="split">Split</option><option value="gradient">Grad</option></select>
+              <input type="color" id="ag-r3-bg1" oninput="applyVisualsLocally()"> <input type="color" id="ag-r3-bg2" oninput="applyVisualsLocally()">
+            </div>
+            <div style="display:flex; gap:10px; align-items:center; background:rgba(0,0,0,0.2); padding:6px; border-radius:4px;">
+              <span style="font-size:11px; font-weight:bold; width:120px; color:#aaa;">Row 3 BADGE BG:</span>
+              <input type="color" id="ag-b3-c" oninput="applyVisualsLocally()" title="Badge Text Color">
+              <select id="ag-b3-style" class="font-select" onchange="applyVisualsLocally()"><option value="solid">Solid</option><option value="split">Split</option><option value="gradient">Grad</option></select>
+              <input type="color" id="ag-b3-bg1" oninput="applyVisualsLocally()"> <input type="color" id="ag-b3-bg2" oninput="applyVisualsLocally()">
+            </div>
+          </div>
+        </div>
+        <div class="sub-panel slider-group" style="margin-bottom:0;">
+          <div class="slider-container"><span>Global Scale</span><input type="range" id="ag-scale" min="0.5" max="2" step="0.05" oninput="applyVisualsLocally()"></div>
+          <div class="slider-container"><span>Font Family</span><select id="ff-ag" class="font-select" onchange="applyVisualsLocally()"><script>document.write(fontOptions);</script></select></div>
+        </div>
+      </div>
+
+      <!-- 2. VERTICAL AGENDA LIST (AUTO-SORTING) -->
+      <div class="collapsible-header" onclick="togglePanel('panel-agl')">2. Vertical Agenda Panel (Linked & Auto-Sorting) <span id="panel-agl-icon">▼</span></div>
+      <div class="collapsible-content" id="panel-agl">
+        <div class="sub-panel">
+          <div class="ctrl-row" style="margin-bottom: 12px; justify-content:space-between;">
+            <label style="display:flex; align-items:center; gap:8px; font-weight:bold; font-size:13px;"><input type="checkbox" id="agl-vis" onchange="applyInstant()"> Show Vertical Agenda List</label>
+            <div style="display:flex; gap:8px;">
+              <input type="text" class="auto-text" id="agl-title" value="Today's Agenda" style="width:200px;" oninput="applyInstant()">
+              <button class="ctrl-btn highlight" onclick="addAgendaItem()">+ Add Topic</button>
+            </div>
+          </div>
+          <div id="agl-controls-container" style="display:flex; flex-direction:column; gap:8px;"></div>
+        </div>
+        <div class="sub-panel slider-group" style="margin-bottom:0;">
+          <span class="section-title">Panel Style (Draggable in overlay)</span>
+          <div class="slider-container"><span>Panel Scale</span><input type="range" id="agl-scale" min="0.5" max="2" step="0.05" oninput="applyVisualsLocally()"></div>
+          <div class="slider-container"><span>Text Color</span><input type="color" id="agl-txt-c" oninput="applyVisualsLocally()"></div>
+          <div class="slider-container"><span>BG Style</span><select id="agl-style" class="font-select" onchange="applyVisualsLocally()"><option value="solid">Solid</option><option value="split">Split</option><option value="gradient">Grad</option></select></div>
+          <div class="slider-container"><span>BG C1</span><input type="color" id="agl-c1" oninput="applyVisualsLocally()"></div>
+          <div class="slider-container"><span>BG C2</span><input type="color" id="agl-c2" oninput="applyVisualsLocally()"></div>
+          <span style="color:#eab308; font-size:12px; font-weight:bold; margin-left:auto;">* Drag the widget directly to move it</span>
+        </div>
+      </div>
+
+      <!-- 3. CUSTOM VERTICAL LIST (FREE TEXT) -->
+      <div class="collapsible-header" onclick="togglePanel('panel-clp')">3. Custom Vertical List (Free Text) <span id="panel-clp-icon">▼</span></div>
+      <div class="collapsible-content" id="panel-clp">
+        <div class="sub-panel">
+          <div class="ctrl-row" style="margin-bottom: 12px; justify-content:space-between;">
+            <label style="display:flex; align-items:center; gap:8px; font-weight:bold; font-size:13px;"><input type="checkbox" id="clp-vis" onchange="applyInstant()"> Show Custom List</label>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <span style="font-size:10px; font-weight:bold; color:#ccc;">GLOBAL HL:</span>
+              <input type="color" id="clp-global-hlc" oninput="applyGlobalClpHighlight()" style="width:24px; height:24px; padding:0; border:none; cursor:pointer;" title="Global Highlight Color">
+              <input type="text" class="auto-text" id="clp-title" value="Team Strengths" style="width:160px;" oninput="applyInstant()">
+              <button class="ctrl-btn highlight" onclick="addClpItem()">+ Add Point</button>
+            </div>
+          </div>
+          <div id="clp-controls-container" style="display:flex; flex-direction:column; gap:8px;"></div>
+        </div>
+        <div class="sub-panel slider-group" style="margin-bottom:0;">
+          <span class="section-title">Panel Style (Draggable in overlay)</span>
+          <div class="slider-container"><span>Panel Scale</span><input type="range" id="clp-scale" min="0.5" max="2" step="0.05" oninput="applyVisualsLocally()"></div>
+          <div class="slider-container"><span>Text Color</span><input type="color" id="clp-txt-c" oninput="applyVisualsLocally()"></div>
+          <div class="slider-container"><span>BG Style</span><select id="clp-style" class="font-select" onchange="applyVisualsLocally()"><option value="solid">Solid</option><option value="split">Split</option><option value="gradient">Grad</option></select></div>
+          <div class="slider-container"><span>BG C1</span><input type="color" id="clp-c1" oninput="applyVisualsLocally()"></div>
+          <div class="slider-container"><span>BG C2</span><input type="color" id="clp-c2" oninput="applyVisualsLocally()"></div>
+          <span style="color:#eab308; font-size:12px; font-weight:bold; margin-left:auto;">* Drag the widget directly to move it</span>
+        </div>
+      </div>
+
+      <!-- 4. NAMEPLATES (HOSTS/GUESTS) -->
+      <div class="collapsible-header" onclick="togglePanel('panel-l3')">4. Guest Nameplates (Lower Thirds) <span id="panel-l3-icon">▼</span></div>
+      <div class="collapsible-content" id="panel-l3">
+        <div class="sub-panel">
+          <div style="display:flex; justify-content:space-between; margin-bottom:12px;">
+            <span class="section-title" style="margin:0; border:none; width:auto;">Manage Guests</span>
+            <button class="ctrl-btn highlight" onclick="addNameplate()">+ Add Guest</button>
+          </div>
+          <div id="nameplate-controls-container" style="display:flex; flex-direction:column; gap:10px;"></div>
+        </div>
+        <div class="sub-panel slider-group" style="margin-bottom:0;">
+          <span class="section-title">Global Typography</span>
+          <div class="slider-container"><span>Font Family</span><select id="ff-l3" class="font-select" onchange="applyVisualsLocally()"><script>document.write(fontOptions);</script></select></div>
+          <div class="slider-container"><span>Name Size</span><input type="range" id="l3-f-name" min="14" max="50" oninput="applyVisualsLocally()"></div>
+          <div class="slider-container"><span>Title Size</span><input type="range" id="l3-f-title" min="10" max="30" oninput="applyVisualsLocally()"></div>
+          <span style="color:#eab308; font-size:12px; font-weight:bold; margin-left:auto;">* Drag nameplates directly to move them</span>
+        </div>
+      </div>
+
+      <!-- 5. LSS & TICKER -->
+      <div class="collapsible-header" onclick="togglePanel('panel-tk')">5. Ticker & LSS Animation <span id="panel-tk-icon">▼</span></div>
+      <div class="collapsible-content" id="panel-tk">
+        <div class="sub-panel">
+          <span class="section-title">Like / Share / Subscribe</span>
+          <div class="ctrl-row" style="margin-bottom:12px;">
+            <label style="font-weight:bold;"><input type="checkbox" id="lss-vis" onchange="applyInstant()"> Show</label>
+            <label style="font-weight:bold; margin-left:15px;"><input type="checkbox" id="lss-anim" onchange="applyInstant()"> Pulsing Animation</label>
+          </div>
+          <div class="slider-group">
+            <div class="slider-container"><span>Scale</span><input type="range" id="lss-scale" min="0.3" max="2" step="0.05" oninput="applyVisualsLocally()"></div>
+            <div class="slider-container"><span>Text C</span><input type="color" id="lss-txt-c" oninput="applyVisualsLocally()"></div>
+            <div class="slider-container"><span>BG Style</span><select id="lss-style" class="font-select" onchange="applyVisualsLocally()"><option value="solid">Solid</option><option value="split">Split</option><option value="gradient">Grad</option></select></div>
+            <div class="slider-container"><span>BG C1</span><input type="color" id="lss-c1" oninput="applyVisualsLocally()"></div>
+            <div class="slider-container"><span>BG C2</span><input type="color" id="lss-c2" oninput="applyVisualsLocally()"></div>
+            <span style="color:#eab308; font-size:12px; font-weight:bold; margin-left:auto;">* Drag widget to move</span>
+          </div>
+        </div>
+        <div class="sub-panel">
+          <span class="section-title">Bottom Ticker</span>
+          <div class="ctrl-row" style="margin-bottom:10px;">
+            <label style="font-weight:bold;"><input type="checkbox" id="tk-vis" onchange="applyInstant()"> Show</label>
+            <label style="font-weight:bold; margin-left:15px;"><input type="checkbox" id="tk-scroll" onchange="applyInstant()"> Scroll</label>
+            <input type="text" class="auto-text" id="tk-txt" oninput="applyInstant()" style="flex:1; margin-left:15px;">
+          </div>
+          <div class="slider-group">
+            <div class="slider-container"><span>Font Fam</span><select id="ff-tk" class="font-select" onchange="applyVisualsLocally()"><script>document.write(fontOptions);</script></select></div>
+            <div class="slider-container"><span>Font Size</span><input type="range" id="tk-f" min="12" max="60" oninput="applyVisualsLocally()"></div>
+            <div class="slider-container"><span>Text C</span><input type="color" id="tk-txt-c" oninput="applyVisualsLocally()"></div>
+            <div class="slider-container"><span>Height</span><input type="range" id="tk-h" min="20" max="100" oninput="applyVisualsLocally()"></div>
+            <div class="slider-container"><span>Opacity</span><input type="range" id="tk-op" min="0.2" max="1" step="0.05" oninput="applyVisualsLocally()"></div>
+            <div class="slider-container" style="border-left:1px solid #444; padding-left:15px;"><span>BG Style</span><select id="tk-style" class="font-select" onchange="applyVisualsLocally()"><option value="solid">Solid</option><option value="split">Split</option><option value="gradient">Grad</option></select></div>
+            <div class="slider-container"><span>BG C1</span><input type="color" id="tk-c1" oninput="applyVisualsLocally()"></div>
+            <div class="slider-container"><span>BG C2</span><input type="color" id="tk-c2" oninput="applyVisualsLocally()"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. BORDERS -->
+      <div class="collapsible-header" onclick="togglePanel('panel-br')">6. Screen Border & Presets <span id="panel-br-icon">▼</span></div>
+      <div class="collapsible-content" id="panel-br">
+        <div class="sub-panel">
+          <div class="ctrl-row" style="margin-bottom:15px; justify-content:space-between;">
+            <label style="font-weight:bold; font-size:14px;"><input type="checkbox" id="br-vis" onchange="applyInstant()"> Enable Global Border</label>
+            <div style="display:flex; gap:8px;">
+              <select id="br-preset-sel" class="font-select" style="width:140px;"><option value="">Select Preset...</option></select>
+              <button class="ctrl-btn highlight" onclick="loadBorderPreset()">Load</button>
+              <button class="ctrl-btn" onclick="saveBorderPreset()">Save New</button>
+              <button class="ctrl-btn warning" onclick="deleteBorderPreset()">Del</button>
+            </div>
+          </div>
+          <div class="slider-group">
+            <div class="slider-container"><span>Thickness</span><input type="range" id="br-w" min="0" max="40" oninput="applyVisualsLocally()"></div>
+            <div class="slider-container"><span>Opacity</span><input type="range" id="br-op" min="0" max="1" step="0.05" oninput="applyVisualsLocally()"></div>
+            <div class="slider-container" style="border-left:1px solid #444; padding-left:15px;"><span>Style</span><select id="br-style" class="font-select" onchange="applyVisualsLocally()"><option value="solid">Solid</option><option value="split">Split</option><option value="gradient">Gradient</option></select></div>
+            <div class="slider-container"><span>Color 1</span><input type="color" id="br-c1" oninput="applyVisualsLocally()"></div>
+            <div class="slider-container"><span>Color 2</span><input type="color" id="br-c2" oninput="applyVisualsLocally()"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 7. TARGETS -->
+      <div class="collapsible-header" onclick="togglePanel('panel-tgt')">7. Targets Box <span id="panel-tgt-icon">▼</span></div>
+      <div class="collapsible-content" id="panel-tgt">
+        <div class="sub-panel">
+          <div class="ctrl-row" style="gap: 20px; margin-bottom:15px;">
+            <label style="font-weight:bold;"><input type="checkbox" id="tgt-vis" onchange="applyInstant()"> Show Target Box</label>
+            <span style="font-weight:bold;">Like:</span><input type="text" class="auto-text" id="tgt-like" style="width:80px;" oninput="applyInstant()">
+            <span style="font-weight:bold;">Sub:</span><input type="text" class="auto-text" id="tgt-sub" style="width:80px;" oninput="applyInstant()">
+          </div>
+          <div class="slider-group">
+            <div class="slider-container"><span>Scale</span><input type="range" id="tgt-scale" min="0.5" max="2" step="0.05" oninput="applyVisualsLocally()"></div>
+            <div class="slider-container"><span>Label Fam</span><select id="ff-tgt-lbl" class="font-select" onchange="applyVisualsLocally()"><script>document.write(fontOptions);</script></select></div>
+            <div class="slider-container"><span>Label Size</span><input type="range" id="tgt-f-lbl" min="8" max="24" oninput="applyVisualsLocally()"></div>
+            <div class="slider-container"><span>Num Fam</span><select id="ff-tgt-val" class="font-select" onchange="applyVisualsLocally()"><script>document.write(fontOptions);</script></select></div>
+            <div class="slider-container"><span>Num Size</span><input type="range" id="tgt-f-val" min="15" max="60" oninput="applyVisualsLocally()"></div>
+            <div class="slider-container" style="border-left:1px solid #444; padding-left:15px;"><span>Style</span><select id="tgt-style" class="font-select" onchange="applyVisualsLocally()"><option value="solid">Solid</option><option value="split">Split</option><option value="gradient">Grad</option></select></div>
+            <div class="slider-container"><span>C1</span><input type="color" id="tgt-c1" oninput="applyVisualsLocally()"></div>
+            <div class="slider-container"><span>C2</span><input type="color" id="tgt-c2" oninput="applyVisualsLocally()"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const isOverlay = urlParams.get('view') === 'overlay';
+    if (isOverlay) { document.getElementById('controls').style.display = 'none'; document.getElementById('drag-hint').style.display = 'none'; }
+
+    // Set Default Dropdowns
+    document.getElementById('ff-ag').value = "'Montserrat', sans-serif";
+    document.getElementById('ff-l3').value = "'Montserrat', sans-serif";
+    document.getElementById('ff-tk').value = "'Montserrat', sans-serif";
+    document.getElementById('ff-tgt-lbl').value = "'Montserrat', sans-serif";
+    document.getElementById('ff-tgt-val').value = "'Teko', sans-serif";
+
+    // History Engine
+    let undoStack = [];
+    let redoStack = [];
+    let initialStateStr = null;
+
+    function saveHistory() {
+      undoStack.push(JSON.parse(JSON.stringify(state)));
+      redoStack = [];
+      if(undoStack.length > 50) undoStack.shift();
+    }
+    function undo() {
+      if(undoStack.length === 0) return;
+      redoStack.push(JSON.parse(JSON.stringify(state)));
+      state = undoStack.pop();
+      fullRender(true); syncVisuals();
+    }
+    function redo() {
+      if(redoStack.length === 0) return;
+      undoStack.push(JSON.parse(JSON.stringify(state)));
+      state = redoStack.pop();
+      fullRender(true); syncVisuals();
+    }
+    function reset() {
+      saveHistory();
+      state = JSON.parse(initialStateStr);
+      fullRender(true); syncVisuals();
+    }
+
+    if(!isOverlay) {
+      document.getElementById('controls').addEventListener('change', (e) => {
+        if(e.target.tagName !== 'INPUT' && e.target.tagName !== 'SELECT') return;
+        saveHistory(); 
+      });
+    }
+
+    // Modals
+    function openLayoutModal() { document.getElementById('modal-bg').style.display = 'block'; document.getElementById('layout-modal').style.display = 'block'; renderLayoutList(); }
+    function openManual() { document.getElementById('modal-bg').style.display = 'block'; document.getElementById('manual-modal').style.display = 'block'; }
+    function closeModals() { document.getElementById('modal-bg').style.display = 'none'; document.getElementById('layout-modal').style.display = 'none'; document.getElementById('manual-modal').style.display = 'none'; document.getElementById('save-warning-modal').style.display = 'none'; }
+
+    // Panels
+    function togglePanel(id) { const c = document.getElementById(id); const i = document.getElementById(id + '-icon'); if (c.classList.contains('active')) { c.classList.remove('active'); i.textContent = '▼'; } else { c.classList.add('active'); i.textContent = '▲'; } }
+    function togglePanelBody() { const b = document.getElementById('controls-body'); const btn = document.getElementById('btn-toggle-panel'); if (b.style.display === 'none') { b.style.display = 'flex'; btn.textContent = 'Minimize Panel'; } else { b.style.display = 'none'; btn.textContent = 'Expand Panel'; } }
+
+    // Unified Drag Logic
+    let isDraggingEl = null, isDraggingPanel = false;
+    let sX, sY, iL, iT;
+
+    document.querySelector('.ctrl-master-header').addEventListener('mousedown', (e) => {
+      if(e.target.closest('button')) return; isDraggingPanel = true;
+      const rect = document.getElementById('controls').getBoundingClientRect();
+      sX = e.clientX; sY = e.clientY; iL = rect.left; iT = rect.top;
+      document.getElementById('controls').style.left = iL + 'px'; document.getElementById('controls').style.top = iT + 'px'; document.getElementById('controls').style.transform = 'none';
+    });
+
+    function attachDraggable(el, updateCallback) {
+      if(el.dataset.dragAttached) return;
+      el.dataset.dragAttached = "true";
+      el.addEventListener('mousedown', (e) => {
+        if(isOverlay || e.button !== 0) return;
+        isDraggingEl = { el, updateCallback };
+        document.getElementById('drag-hint').style.display = 'block';
+      });
+    }
+
+    document.addEventListener('mousemove', (e) => {
+      if(isDraggingPanel) {
+        document.getElementById('controls').style.left = (iL + e.clientX - sX) + 'px'; document.getElementById('controls').style.top = (iT + e.clientY - sY) + 'px';
+      }
+      if(isDraggingEl) {
+        const px = (e.clientX / window.innerWidth) * 100; const py = (e.clientY / window.innerHeight) * 100;
+        isDraggingEl.el.style.left = px + '%'; isDraggingEl.el.style.top = py + '%';
+        isDraggingEl.updateCallback(px, py);
+      }
+    });
+
+    document.addEventListener('mouseup', () => {
+      isDraggingPanel = false;
+      if(isDraggingEl) { saveHistory(); isDraggingEl = null; document.getElementById('drag-hint').style.display = 'none'; syncVisuals(); }
+    });
+
+    // MASTER STATE
+    let state = {
+      // Agenda Tracker
+      agVis: true, agScale: 1, ffAg: "'Montserrat', sans-serif",
+      agR1Txt: "Sports Unplugged India | Live Discussion", agR1F: 24, agR1C: "#ffffff", agR1Style: "gradient", agR1Bg1: "#111111", agR1Bg2: "#222222",
+      agR2Txt: "Pre-Match Build Up", agR2F: 18, agR2C: "#ffffff", agR2Style: "split", agR2Bg1: "#d31122", agR2Bg2: "#f6b200", agB2C: "#111111", agB2Style: "solid", agB2Bg1: "#ffd700", agB2Bg2: "#ffd700",
+      agR3Txt: "East Bengal Tactical Breakdown", agR3F: 16, agR3C: "#aaaaaa", agR3Style: "solid", agR3Bg1: "#111111", agR3Bg2: "#111111", agB3C: "#ffffff", agB3Style: "solid", agB3Bg1: "#3b82f6", agB3Bg2: "#3b82f6",
+      
+      // Agenda Vertical List (Linked)
+      aglVis: false, aglTitle: "Today's Agenda", aglScale: 1, aglX: 80, aglY: 50, aglTxtC: "#ffffff", aglStyle: "gradient", aglC1: "#111111", aglC2: "#222222",
+      agendaItems: [ {id: 1, text: "Pre-Match Build Up", status: "now"}, {id: 2, text: "East Bengal Tactical Breakdown", status: "next"} ],
+
+      // Custom Vertical List (Free text)
+      clpVis: false, clpTitle: "Key Talking Points", clpScale: 1, clpX: 20, clpY: 50, clpTxtC: "#ffffff", clpStyle: "gradient", clpC1: "#111111", clpC2: "#222222", clpGlobalHlC: "#ffd700",
+      clpItems: [ {id: 1, text: "Strong Attack", hl: false, hlC: "#ffd700"} ],
+
+      // Nameplates
+      ffL3: "'Montserrat', sans-serif", l3FName: 26, l3FTitle: 14,
+      nameplates: [ { id: 1, name: "Ankit Bhattacharjee", title: "Host | SUI", vis: true, x: 20, y: 80, scale: 1, style: "gradient", c1: "#d31122", c2: "#f6b200", txtNameC: "#ffffff", txtTitleC: "#dddddd", titleStyle: "solid", titleBg1: "#0c0e12", titleBg2: "#0c0e12" } ],
+      
+      // LSS
+      lssVis: true, lssAnim: true, lssScale: 1, lssX: 50, lssY: 20, lssStyle: "gradient", lssC1: "#ff0000", lssC2: "#cc0000", lssTxtC: "#ffffff",
+      
+      // Ticker
+      tkVis: true, tkScroll: true, tkTxt: "Welcome to Sports Unplugged India! Please Like and Subscribe.", ffTk: "'Montserrat', sans-serif", tkF: 22, tkTxtC: "#ffffff", tkH: 40, tkOp: 0.9, tkStyle: "gradient", tkC1: "#1a202c", tkC2: "#2d3748",
+      
+      // Borders
+      brVis: false, brW: 8, brOp: 1, brStyle: "split", brC1: "#d31122", brC2: "#f6b200",
+      
+      // Targets
+      tgtVis: true, tgtLike: "25", tgtSub: "900", tgtScale: 1, ffTgtLbl: "'Montserrat', sans-serif", fTgtLbl: 13, ffTgtVal: "'Teko', sans-serif", fTgtVal: 30, tgtStyle: "gradient", tgtC1: "#2c3e50", tgtC2: "#636e72"
+    };
+
+    const pubnub = new PubNub({ publishKey: 'demo', subscribeKey: 'demo', userId: 'sui_v5_' + Math.random().toString(36).substring(2, 9) });
+    pubnub.subscribe({ channels: ['sui_v5_channel'] });
+    pubnub.addListener({ message: function(e) { Object.assign(state, e.message); fullRender(false); } });
+
+    // --- LOGIC FUNCTIONS ---
+    function getGrad(style, c1, c2) {
+      if(style === 'solid') return c1; if(style === 'split') return `linear-gradient(90deg, ${c1} 50%, ${c2} 50%)`; return `linear-gradient(135deg, ${c1} 0%, ${c2} 100%)`;
+    }
+
+    // Nameplates
+    function addNameplate() {
+      saveHistory();
+      state.nameplates.push({ id: Date.now(), name: "New Guest", title: "Analyst", vis: true, x: 80, y: 80, scale: 1, style: "gradient", c1: "#1e3a8a", c2: "#3b82f6", txtNameC: "#ffffff", txtTitleC: "#dddddd", titleStyle: "solid", titleBg1: "#0c0e12", titleBg2: "#0c0e12" });
+      fullRender(true); syncVisuals();
+    }
+    function removeNameplate(id) { saveHistory(); state.nameplates = state.nameplates.filter(n => n.id !== id); fullRender(true); syncVisuals(); }
+    
+    // Agenda Items (Linked & Auto-Sorting)
+    function addAgendaItem() {
+      saveHistory();
+      state.agendaItems.push({ id: Date.now(), text: "New Topic", status: "none" });
+      fullRender(true); syncVisuals();
+    }
+    function removeAgendaItem(id) { saveHistory(); state.agendaItems = state.agendaItems.filter(a => a.id !== id); fullRender(true); syncVisuals(); }
+    function setAgendaStatus(id, status) {
+      saveHistory();
+      const item = state.agendaItems.find(a => a.id === id);
+      
+      if(item.status === status) {
+        item.status = 'none'; // Toggle off if clicked twice
+      } else {
+        if(status === 'now') {
+          state.agendaItems.forEach(a => { if(a.status==='now') a.status='none'; }); 
+          item.status = 'now'; state.agR2Txt = item.text;
+        } else if (status === 'next') {
+          state.agendaItems.forEach(a => { if(a.status==='next') a.status='none'; }); 
+          item.status = 'next'; state.agR3Txt = item.text;
+        } else if (status === 'completed') {
+          item.status = 'completed';
+        }
+      }
+      
+      // Auto-Sort Engine
+      const order = { 'now': 1, 'next': 2, 'none': 3, 'completed': 4 };
+      state.agendaItems.sort((a, b) => order[a.status] - order[b.status]);
+      
+      fullRender(true); syncVisuals();
+    }
+
+    // Custom List Items (Free Text)
+    function addClpItem() {
+      saveHistory();
+      const color = state.clpGlobalHlC || "#ffd700";
+      state.clpItems.push({ id: Date.now(), text: "New Point", hl: false, hlC: color });
+      fullRender(true); syncVisuals();
+    }
+    function removeClpItem(id) { saveHistory(); state.clpItems = state.clpItems.filter(a => a.id !== id); fullRender(true); syncVisuals(); }
+    function toggleClpHighlight(id) {
+      saveHistory();
+      const item = state.clpItems.find(a => a.id === id);
+      item.hl = !item.hl;
+      fullRender(true); syncVisuals();
+    }
+    function applyGlobalClpHighlight() {
+      saveHistory();
+      const color = document.getElementById('clp-global-hlc').value;
+      state.clpGlobalHlC = color;
+      if(state.clpItems) { state.clpItems.forEach(item => { item.hlC = color; }); }
+      fullRender(true); syncVisuals();
+    }
+
+    // --- SYNC & RENDER ---
+    function applyInstant() {
+      state.agVis = document.getElementById('ctrl-ag-vis').checked;
+      state.agR1Txt = document.getElementById('ag-r1-txt').value;
+      state.agR2Txt = document.getElementById('ag-r2-txt').value;
+      state.agR3Txt = document.getElementById('ag-r3-txt').value;
+
+      state.aglVis = document.getElementById('agl-vis').checked;
+      state.aglTitle = document.getElementById('agl-title').value;
+      state.agendaItems.forEach(item => { item.text = document.getElementById(`agl-txt-${item.id}`).value; });
+
+      state.clpVis = document.getElementById('clp-vis').checked;
+      state.clpTitle = document.getElementById('clp-title').value;
+      state.clpItems = state.clpItems || [];
+      state.clpItems.forEach(item => {
+        if(document.getElementById(`clp-txt-${item.id}`)) {
+          item.text = document.getElementById(`clp-txt-${item.id}`).value;
+          item.hlC = document.getElementById(`clp-c-${item.id}`).value;
+        }
+      });
+
+      state.nameplates.forEach(np => {
+        np.vis = document.getElementById(`np-vis-${np.id}`).checked;
+        np.name = document.getElementById(`np-name-${np.id}`).value;
+        np.title = document.getElementById(`np-title-${np.id}`).value;
+      });
+
+      state.lssVis = document.getElementById('lss-vis').checked; state.lssAnim = document.getElementById('lss-anim').checked;
+      state.tkVis = document.getElementById('tk-vis').checked; state.tkScroll = document.getElementById('tk-scroll').checked; state.tkTxt = document.getElementById('tk-txt').value;
+      state.brVis = document.getElementById('br-vis').checked;
+      state.tgtVis = document.getElementById('tgt-vis').checked; state.tgtLike = document.getElementById('tgt-like').value; state.tgtSub = document.getElementById('tgt-sub').value;
+
+      pubnub.publish({ channel: 'sui_v5_channel', message: state });
+      fullRender(false); 
+    }
+
+    function applyVisualsLocally() {
+      state.agScale = document.getElementById('ag-scale').value; state.ffAg = document.getElementById('ff-ag').value;
+      state.agR1F = document.getElementById('ag-r1-f').value; state.agR1C = document.getElementById('ag-r1-c').value; state.agR1Style = document.getElementById('ag-r1-style').value; state.agR1Bg1 = document.getElementById('ag-r1-bg1').value; state.agR1Bg2 = document.getElementById('ag-r1-bg2').value;
+      state.agR2F = document.getElementById('ag-r2-f').value; state.agR2C = document.getElementById('ag-r2-c').value; state.agR2Style = document.getElementById('ag-r2-style').value; state.agR2Bg1 = document.getElementById('ag-r2-bg1').value; state.agR2Bg2 = document.getElementById('ag-r2-bg2').value;
+      state.agB2C = document.getElementById('ag-b2-c').value; state.agB2Style = document.getElementById('ag-b2-style').value; state.agB2Bg1 = document.getElementById('ag-b2-bg1').value; state.agB2Bg2 = document.getElementById('ag-b2-bg2').value;
+      state.agR3F = document.getElementById('ag-r3-f').value; state.agR3C = document.getElementById('ag-r3-c').value; state.agR3Style = document.getElementById('ag-r3-style').value; state.agR3Bg1 = document.getElementById('ag-r3-bg1').value; state.agR3Bg2 = document.getElementById('ag-r3-bg2').value;
+      state.agB3C = document.getElementById('ag-b3-c').value; state.agB3Style = document.getElementById('ag-b3-style').value; state.agB3Bg1 = document.getElementById('ag-b3-bg1').value; state.agB3Bg2 = document.getElementById('ag-b3-bg2').value;
+
+      state.aglScale = document.getElementById('agl-scale').value; state.aglTxtC = document.getElementById('agl-txt-c').value; state.aglStyle = document.getElementById('agl-style').value; state.aglC1 = document.getElementById('agl-c1').value; state.aglC2 = document.getElementById('agl-c2').value;
+      
+      state.clpScale = document.getElementById('clp-scale').value; state.clpTxtC = document.getElementById('clp-txt-c').value; state.clpStyle = document.getElementById('clp-style').value; state.clpC1 = document.getElementById('clp-c1').value; state.clpC2 = document.getElementById('clp-c2').value;
+
+      state.ffL3 = document.getElementById('ff-l3').value; state.l3FName = document.getElementById('l3-f-name').value; state.l3FTitle = document.getElementById('l3-f-title').value;
+
+      state.nameplates.forEach(np => {
+        if(document.getElementById(`np-scale-${np.id}`)) {
+          np.scale = document.getElementById(`np-scale-${np.id}`).value;
+          np.style = document.getElementById(`np-style-${np.id}`).value;
+          np.c1 = document.getElementById(`np-c1-${np.id}`).value;
+          np.c2 = document.getElementById(`np-c2-${np.id}`).value;
+          np.txtNameC = document.getElementById(`np-txt-name-c-${np.id}`).value;
+          np.txtTitleC = document.getElementById(`np-txt-title-c-${np.id}`).value;
+          np.titleStyle = document.getElementById(`np-title-style-${np.id}`).value;
+          np.titleBg1 = document.getElementById(`np-title-bg1-${np.id}`).value;
+          np.titleBg2 = document.getElementById(`np-title-bg2-${np.id}`).value;
+        }
+      });
+
+      state.lssScale = document.getElementById('lss-scale').value; state.lssTxtC = document.getElementById('lss-txt-c').value; state.lssStyle = document.getElementById('lss-style').value; state.lssC1 = document.getElementById('lss-c1').value; state.lssC2 = document.getElementById('lss-c2').value;
+      state.ffTk = document.getElementById('ff-tk').value; state.tkF = document.getElementById('tk-f').value; state.tkTxtC = document.getElementById('tk-txt-c').value; state.tkH = document.getElementById('tk-h').value; state.tkOp = document.getElementById('tk-op').value; state.tkStyle = document.getElementById('tk-style').value; state.tkC1 = document.getElementById('tk-c1').value; state.tkC2 = document.getElementById('tk-c2').value;
+      state.brW = document.getElementById('br-w').value; state.brOp = document.getElementById('br-op').value; state.brStyle = document.getElementById('br-style').value; state.brC1 = document.getElementById('br-c1').value; state.brC2 = document.getElementById('br-c2').value;
+      state.tgtScale = document.getElementById('tgt-scale').value; state.ffTgtLbl = document.getElementById('ff-tgt-lbl').value; state.fTgtLbl = document.getElementById('tgt-f-lbl').value; state.ffTgtVal = document.getElementById('ff-tgt-val').value; state.fTgtVal = document.getElementById('tgt-f-val').value; state.tgtStyle = document.getElementById('tgt-style').value; state.tgtC1 = document.getElementById('tgt-c1').value; state.tgtC2 = document.getElementById('tgt-c2').value;
+
+      applyCSSVars();
+    }
+
+    function syncVisuals() { applyVisualsLocally(); pubnub.publish({ channel: 'sui_v5_channel', message: state }); }
+
+    function applyCSSVars() {
+      const r = document.documentElement;
+      r.style.setProperty('--ag-scale', state.agScale); r.style.setProperty('--ff-ag', state.ffAg);
+      r.style.setProperty('--ag-r1-f', state.agR1F+'px'); r.style.setProperty('--ag-r1-c', state.agR1C); r.style.setProperty('--ag-r1-bg', getGrad(state.agR1Style, state.agR1Bg1, state.agR1Bg2));
+      r.style.setProperty('--ag-r2-f', state.agR2F+'px'); r.style.setProperty('--ag-r2-c', state.agR2C); r.style.setProperty('--ag-r2-bg', getGrad(state.agR2Style, state.agR2Bg1, state.agR2Bg2));
+      r.style.setProperty('--ag-b2-c', state.agB2C); r.style.setProperty('--ag-b2-bg', getGrad(state.agB2Style, state.agB2Bg1, state.agB2Bg2));
+      r.style.setProperty('--ag-r3-f', state.agR3F+'px'); r.style.setProperty('--ag-r3-c', state.agR3C); r.style.setProperty('--ag-r3-bg', getGrad(state.agR3Style, state.agR3Bg1, state.agR3Bg2));
+      r.style.setProperty('--ag-b3-c', state.agB3C); r.style.setProperty('--ag-b3-bg', getGrad(state.agB3Style, state.agB3Bg1, state.agB3Bg2));
+      
+      r.style.setProperty('--agl-scale', state.aglScale); r.style.setProperty('--agl-x', state.aglX+'%'); r.style.setProperty('--agl-y', state.aglY+'%'); r.style.setProperty('--agl-txt', state.aglTxtC); r.style.setProperty('--agl-bg', getGrad(state.aglStyle, state.aglC1, state.aglC2));
+      
+      r.style.setProperty('--clp-scale', state.clpScale); r.style.setProperty('--clp-x', state.clpX+'%'); r.style.setProperty('--clp-y', state.clpY+'%'); r.style.setProperty('--clp-txt', state.clpTxtC); r.style.setProperty('--clp-bg', getGrad(state.clpStyle, state.clpC1, state.clpC2));
+      
+      r.style.setProperty('--ff-l3', state.ffL3); r.style.setProperty('--l3-f-name', state.l3FName+'px'); r.style.setProperty('--l3-f-title', state.l3FTitle+'px');
+      
+      state.nameplates.forEach(np => {
+        const el = document.getElementById(`np-overlay-${np.id}`);
+        if(el) { 
+          el.style.left = np.x+'%'; el.style.top = np.y+'%'; el.style.transform = `translate(-50%, -50%) scale(${np.scale})`; 
+          const topEl = el.querySelector('.np-top');
+          const botEl = el.querySelector('.np-bottom');
+          if(topEl) { topEl.style.background = getGrad(np.style, np.c1, np.c2); topEl.style.color = np.txtNameC; }
+          if(botEl) { botEl.style.background = getGrad(np.titleStyle, np.titleBg1, np.titleBg2); botEl.style.color = np.txtTitleC; }
+        }
+      });
+
+      r.style.setProperty('--lss-scale', state.lssScale); r.style.setProperty('--lss-x', state.lssX+'%'); r.style.setProperty('--lss-y', state.lssY+'%'); r.style.setProperty('--lss-bg', getGrad(state.lssStyle, state.lssC1, state.lssC2)); r.style.setProperty('--lss-txt', state.lssTxtC);
+      
+      r.style.setProperty('--tk-h', state.tkH+'px'); r.style.setProperty('--ff-tk', state.ffTk); r.style.setProperty('--tk-f', state.tkF+'px'); r.style.setProperty('--tk-txt-c', state.tkTxtC); r.style.setProperty('--tk-op', state.tkOp);
+      document.getElementById('ticker-bg').style.background = getGrad(state.tkStyle, state.tkC1, state.tkC2);
+      
+      r.style.setProperty('--br-w', state.brW+'px'); r.style.setProperty('--br-op', state.brOp); r.style.setProperty('--br-style', getGrad(state.brStyle, state.brC1, state.brC2));
+      
+      r.style.setProperty('--target-scale', state.tgtScale); r.style.setProperty('--ff-tgt-lbl', state.ffTgtLbl); r.style.setProperty('--f-tgt-label', state.fTgtLbl+'px'); r.style.setProperty('--ff-tgt-val', state.ffTgtVal); r.style.setProperty('--f-tgt-val', state.fTgtVal+'px');
+      document.getElementById('targets-wrapper').style.background = getGrad(state.tgtStyle, state.tgtC1, state.tgtC2);
+    }
+
+    function fullRender(forceRebuildControls = false) {
+      if(!isOverlay) {
+        document.getElementById('clp-global-hlc').value = state.clpGlobalHlC || "#ffd700";
+
+        document.getElementById('ctrl-ag-vis').checked = state.agVis; document.getElementById('ag-r1-txt').value = state.agR1Txt; document.getElementById('ag-r2-txt').value = state.agR2Txt; document.getElementById('ag-r3-txt').value = state.agR3Txt;
+        document.getElementById('ag-r1-f').value = state.agR1F; document.getElementById('ag-r1-c').value = state.agR1C; document.getElementById('ag-r1-style').value = state.agR1Style; document.getElementById('ag-r1-bg1').value = state.agR1Bg1; document.getElementById('ag-r1-bg2').value = state.agR1Bg2;
+        document.getElementById('ag-r2-f').value = state.agR2F; document.getElementById('ag-r2-c').value = state.agR2C; document.getElementById('ag-r2-style').value = state.agR2Style; document.getElementById('ag-r2-bg1').value = state.agR2Bg1; document.getElementById('ag-r2-bg2').value = state.agR2Bg2;
+        document.getElementById('ag-b2-c').value = state.agB2C; document.getElementById('ag-b2-style').value = state.agB2Style; document.getElementById('ag-b2-bg1').value = state.agB2Bg1; document.getElementById('ag-b2-bg2').value = state.agB2Bg2;
+        document.getElementById('ag-r3-f').value = state.agR3F; document.getElementById('ag-r3-c').value = state.agR3C; document.getElementById('ag-r3-style').value = state.agR3Style; document.getElementById('ag-r3-bg1').value = state.agR3Bg1; document.getElementById('ag-r3-bg2').value = state.agR3Bg2;
+        document.getElementById('ag-b3-c').value = state.agB3C; document.getElementById('ag-b3-style').value = state.agB3Style; document.getElementById('ag-b3-bg1').value = state.agB3Bg1; document.getElementById('ag-b3-bg2').value = state.agB3Bg2;
+        document.getElementById('ag-scale').value = state.agScale; document.getElementById('ff-ag').value = state.ffAg;
+
+        document.getElementById('agl-vis').checked = state.aglVis; document.getElementById('agl-title').value = state.aglTitle;
+        document.getElementById('agl-scale').value = state.aglScale; document.getElementById('agl-txt-c').value = state.aglTxtC; document.getElementById('agl-style').value = state.aglStyle; document.getElementById('agl-c1').value = state.aglC1; document.getElementById('agl-c2').value = state.aglC2;
+        
+        document.getElementById('clp-vis').checked = state.clpVis; document.getElementById('clp-title').value = state.clpTitle;
+        document.getElementById('clp-scale').value = state.clpScale; document.getElementById('clp-txt-c').value = state.clpTxtC; document.getElementById('clp-style').value = state.clpStyle; document.getElementById('clp-c1').value = state.clpC1; document.getElementById('clp-c2').value = state.clpC2;
+
+        document.getElementById('ff-l3').value = state.ffL3; document.getElementById('l3-f-name').value = state.l3FName; document.getElementById('l3-f-title').value = state.l3FTitle;
+        
+        document.getElementById('lss-vis').checked = state.lssVis; document.getElementById('lss-anim').checked = state.lssAnim; document.getElementById('lss-scale').value = state.lssScale; document.getElementById('lss-txt-c').value = state.lssTxtC; document.getElementById('lss-style').value = state.lssStyle; document.getElementById('lss-c1').value = state.lssC1; document.getElementById('lss-c2').value = state.lssC2;
+        
+        document.getElementById('tk-vis').checked = state.tkVis; document.getElementById('tk-scroll').checked = state.tkScroll; document.getElementById('tk-txt').value = state.tkTxt;
+        document.getElementById('ff-tk').value = state.ffTk; document.getElementById('tk-f').value = state.tkF; document.getElementById('tk-txt-c').value = state.tkTxtC; document.getElementById('tk-h').value = state.tkH; document.getElementById('tk-op').value = state.tkOp; document.getElementById('tk-style').value = state.tkStyle; document.getElementById('tk-c1').value = state.tkC1; document.getElementById('tk-c2').value = state.tkC2;
+
+        document.getElementById('br-vis').checked = state.brVis; document.getElementById('br-w').value = state.brW; document.getElementById('br-op').value = state.brOp; document.getElementById('br-style').value = state.brStyle; document.getElementById('br-c1').value = state.brC1; document.getElementById('br-c2').value = state.brC2;
+        
+        document.getElementById('tgt-vis').checked = state.tgtVis; document.getElementById('tgt-like').value = state.tgtLike; document.getElementById('tgt-sub').value = state.tgtSub; document.getElementById('tgt-scale').value = state.tgtScale; document.getElementById('ff-tgt-lbl').value = state.ffTgtLbl; document.getElementById('tgt-f-lbl').value = state.fTgtLbl; document.getElementById('ff-tgt-val').value = state.ffTgtVal; document.getElementById('tgt-f-val').value = state.fTgtVal; document.getElementById('tgt-style').value = state.tgtStyle; document.getElementById('tgt-c1').value = state.tgtC1; document.getElementById('tgt-c2').value = state.tgtC2;
+        
+        if (forceRebuildControls) renderControls();
+      }
+
+      // Update Overlay DOM
+      document.getElementById('agenda-wrapper').style.display = state.agVis ? 'flex' : 'none';
+      document.getElementById('ag-row-1').textContent = state.agR1Txt; document.getElementById('ag-text-2').textContent = state.agR2Txt; document.getElementById('ag-text-3').textContent = state.agR3Txt;
+      
+      document.getElementById('agl-wrapper').style.display = state.aglVis ? 'flex' : 'none';
+      document.getElementById('agl-title-display').textContent = state.aglTitle;
+      
+      // Vertical Agenda Mapping with Live Bulb, Up Next, and Completed
+      document.getElementById('agl-list-render').innerHTML = state.agendaItems.map(i => {
+        let pre = i.status === 'now' ? '<div class="ag-live-bulb"></div>' : '';
+        let post = i.status === 'next' ? '<div class="ag-up-next">UP NEXT</div>' : (i.status === 'completed' ? '<div class="ag-completed">✔</div>' : '');
+        return `<div class="agl-item status-${i.status}">${pre}<span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${i.text}</span>${post}</div>`;
+      }).join('');
+      attachDraggable(document.getElementById('agl-wrapper'), (x, y) => { state.aglX = x; state.aglY = y; });
+
+      document.getElementById('clp-wrapper').style.display = state.clpVis ? 'flex' : 'none';
+      document.getElementById('clp-title-display').textContent = state.clpTitle;
+      document.getElementById('clp-list-render').innerHTML = (state.clpItems || []).map(i => {
+        let styleStr = i.hl ? `border-left-color: ${i.hlC}; background: ${i.hlC}33; color: ${i.hlC};` : '';
+        return `<div class="clp-item ${i.hl ? 'highlighted' : ''}" style="${styleStr}">${i.text}</div>`;
+      }).join('');
+      attachDraggable(document.getElementById('clp-wrapper'), (x, y) => { state.clpX = x; state.clpY = y; });
+
+      document.getElementById('overlay-nameplates').innerHTML = state.nameplates.map(np => 
+        np.vis ? `<div class="nameplate-wrapper" id="np-overlay-${np.id}" style="left:${np.x}%; top:${np.y}%;"><div class="np-top" style="color:${np.txtNameC}; background:${getGrad(np.style, np.c1, np.c2)};">${np.name}</div><div class="np-bottom" style="color:${np.txtTitleC}; background:${getGrad(np.titleStyle, np.titleBg1, np.titleBg2)};">${np.title}</div></div>` : ''
+      ).join('');
+      state.nameplates.forEach(np => {
+        const el = document.getElementById(`np-overlay-${np.id}`);
+        if(el) attachDraggable(el, (x, y) => { np.x = x; np.y = y; });
+      });
+
+      document.getElementById('lss-widget').style.display = state.lssVis ? 'flex' : 'none';
+      document.getElementById('lss-widget').className = state.lssAnim ? 'lss-wrapper lss-animated' : 'lss-wrapper';
+      attachDraggable(document.getElementById('lss-widget'), (x, y) => { state.lssX = x; state.lssY = y; });
+
+      document.getElementById('ticker-wrapper').style.display = state.tkVis ? 'flex' : 'none';
+      document.getElementById('ticker-text').textContent = state.tkTxt; document.getElementById('ticker-text').className = state.tkScroll ? 'ticker-text scrolling' : 'ticker-text static';
+
+      document.getElementById('global-frame').style.display = state.brVis ? 'block' : 'none';
+      
+      document.getElementById('targets-wrapper').style.display = state.tgtVis ? 'flex' : 'none';
+      document.getElementById('like-target-display').textContent = state.tgtLike; document.getElementById('sub-target-display').textContent = state.tgtSub;
+
+      applyCSSVars();
+    }
+
+    function renderControls() {
+      if(isOverlay) return;
+      document.getElementById('agl-controls-container').innerHTML = state.agendaItems.map(i => `
+        <div style="display:flex; gap:6px; align-items:center;">
+          <input type="text" class="auto-text" id="agl-txt-${i.id}" value="${i.text}" style="flex:1;" oninput="applyInstant()">
+          <button class="ctrl-btn ${i.status==='now'?'highlight':''}" onclick="setAgendaStatus(${i.id}, 'now')">${i.status==='now'?'Unset Now':'Set Now'}</button>
+          <button class="ctrl-btn ${i.status==='next'?'special':''}" onclick="setAgendaStatus(${i.id}, 'next')">${i.status==='next'?'Unset Next':'Set Next'}</button>
+          <button class="ctrl-btn ${i.status==='completed'?'warning':''}" onclick="setAgendaStatus(${i.id}, 'completed')" style="background:${i.status==='completed'?'#10b981':''}; border-color:${i.status==='completed'?'#059669':''}">${i.status==='completed'?'Unmark Done':'Mark Done'}</button>
+          <button class="ctrl-btn warning" onclick="removeAgendaItem(${i.id})">X</button>
+        </div>
+      `).join('');
+
+      document.getElementById('clp-controls-container').innerHTML = (state.clpItems || []).map(i => `
+        <div style="display:flex; gap:6px; align-items:center;">
+          <input type="text" class="auto-text" id="clp-txt-${i.id}" value="${i.text}" style="flex:1;" oninput="applyInstant()">
+          <input type="color" id="clp-c-${i.id}" value="${i.hlC}" oninput="applyInstant()" style="width:24px; height:24px; padding:0; border:none; cursor:pointer;" title="Highlight Color">
+          <button class="ctrl-btn ${i.hl?'highlight':''}" onclick="toggleClpHighlight(${i.id})">${i.hl?'Unhighlight':'Highlight'}</button>
+          <button class="ctrl-btn warning" onclick="removeClpItem(${i.id})">X</button>
+        </div>
+      `).join('');
+
+      document.getElementById('nameplate-controls-container').innerHTML = state.nameplates.map(np => `
+        <div style="background:rgba(0,0,0,0.3); padding:10px; border:1px solid #444; border-radius:6px;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+            <label style="font-weight:bold;"><input type="checkbox" id="np-vis-${np.id}" ${np.vis?'checked':''} onchange="applyInstant()"> Show</label>
+            <button class="ctrl-btn warning" style="padding:2px 8px; font-size:10px;" onclick="removeNameplate(${np.id})">Delete</button>
+          </div>
+          <div style="display:flex; gap:6px; margin-bottom:8px;">
+            <input type="text" class="auto-text" id="np-name-${np.id}" value="${np.name}" placeholder="Name" oninput="applyInstant()">
+            <input type="text" class="auto-text" id="np-title-${np.id}" value="${np.title}" placeholder="Title" oninput="applyInstant()">
+          </div>
+          <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:8px;">
+            <span style="font-size:10px; font-weight:bold; color:#ccc;">NAME BG:</span> 
+            <input type="range" id="np-scale-${np.id}" min="0.5" max="2" step="0.05" value="${np.scale}" style="width:50px;" oninput="applyVisualsLocally()">
+            <select id="np-style-${np.id}" class="font-select" onchange="applyVisualsLocally()"><option value="solid" ${np.style==='solid'?'selected':''}>Solid</option><option value="split" ${np.style==='split'?'selected':''}>Split</option><option value="gradient" ${np.style==='gradient'?'selected':''}>Grad</option></select>
+            <input type="color" id="np-c1-${np.id}" value="${np.c1}" oninput="applyVisualsLocally()" style="width:24px; height:24px;">
+            <input type="color" id="np-c2-${np.id}" value="${np.c2}" oninput="applyVisualsLocally()" style="width:24px; height:24px;">
+            
+            <span style="font-size:10px; font-weight:bold; color:#ccc; margin-left:10px;">NAME TEXT C:</span>
+            <input type="color" id="np-txt-name-c-${np.id}" value="${np.txtNameC}" oninput="applyVisualsLocally()" style="width:24px; height:24px;" title="Name Text Color">
+            
+            <span style="font-size:10px; font-weight:bold; color:#ccc; margin-left:10px;">TITLE TEXT C:</span>
+            <input type="color" id="np-txt-title-c-${np.id}" value="${np.txtTitleC}" oninput="applyVisualsLocally()" style="width:24px; height:24px;" title="Title Text Color">
+            
+            <span style="font-size:10px; font-weight:bold; color:#ccc; margin-left:10px;">TITLE BG:</span>
+            <select id="np-title-style-${np.id}" class="font-select" onchange="applyVisualsLocally()"><option value="solid" ${np.titleStyle==='solid'?'selected':''}>Solid</option><option value="split" ${np.titleStyle==='split'?'selected':''}>Split</option><option value="gradient" ${np.titleStyle==='gradient'?'selected':''}>Grad</option></select>
+            <input type="color" id="np-title-bg1-${np.id}" value="${np.titleBg1}" oninput="applyVisualsLocally()" style="width:24px; height:24px;">
+            <input type="color" id="np-title-bg2-${np.id}" value="${np.titleBg2}" oninput="applyVisualsLocally()" style="width:24px; height:24px;">
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // --- PRESETS & LAYOUTS ---
+    let borderPresets = {};
+    const defaultBorderPresets = {
+      'East Bengal Split': { w:8, op:1, style:'split', c1:'#d31122', c2:'#f6b200' },
+      'Cyber Gradient': { w:12, op:1, style:'gradient', c1:'#06b6d4', c2:'#9333ea' },
+      'Solid White Thin': { w:4, op:0.8, style:'solid', c1:'#ffffff', c2:'#ffffff' },
+      'Neon Blue': { w:8, op:1, style:'gradient', c1:'#00f2fe', c2:'#4facfe' },
+      'Crimson Force': { w:10, op:1, style:'split', c1:'#ff0844', c2:'#ffb199' },
+      'Emerald Outline': { w:6, op:0.9, style:'solid', c1:'#10b981', c2:'#10b981' },
+      'Royal Purple': { w:12, op:1, style:'gradient', c1:'#667eea', c2:'#764ba2' },
+      'Sunset Orange': { w:8, op:1, style:'gradient', c1:'#ff9a9e', c2:'#fecfef' },
+      'Monochrome Tech': { w:10, op:1, style:'split', c1:'#333333', c2:'#aaaaaa' },
+      'Gold Split': { w:8, op:1, style:'split', c1:'#ffd700', c2:'#b8860b' }
+    };
+
+    function initBorderPresets() {
+      const stored = localStorage.getItem('suiBorderPresetsV5');
+      borderPresets = stored ? JSON.parse(stored) : defaultBorderPresets;
+      updatePresetDropdown();
+    }
+    function updatePresetDropdown() {
+      const sel = document.getElementById('br-preset-sel'); sel.innerHTML = '<option value="">Presets...</option>';
+      Object.keys(borderPresets).forEach(k => { sel.innerHTML += `<option value="${k}">${k}</option>`; });
+    }
+    function saveBorderPreset() {
+      const name = prompt("Name this preset:"); if(!name) return;
+      borderPresets[name] = { w: state.brW, op: state.brOp, style: state.brStyle, c1: state.brC1, c2: state.brC2 };
+      localStorage.setItem('suiBorderPresetsV5', JSON.stringify(borderPresets)); updatePresetDropdown(); alert("Saved!");
+    }
+    function loadBorderPreset() {
+      saveHistory(); const p = borderPresets[document.getElementById('br-preset-sel').value]; if(!p) return;
+      state.brW = p.w; state.brOp = p.op; state.brStyle = p.style; state.brC1 = p.c1; state.brC2 = p.c2; 
+      fullRender(true); pubnub.publish({ channel: 'sui_v5_channel', message: state });
+    }
+    function deleteBorderPreset() {
+      const n = document.getElementById('br-preset-sel').value; if(!n || !confirm(`Delete ${n}?`)) return;
+      delete borderPresets[n]; localStorage.setItem('suiBorderPresetsV5', JSON.stringify(borderPresets)); updatePresetDropdown();
+    }
+
+    let savedLayouts = {}; let currentLayoutName = "Default";
+    function generateBaseLayouts() {
+      const b = JSON.parse(initialStateStr); 
+      const out = { "Default": JSON.parse(JSON.stringify(b)) };
+      
+      const sizes = [
+        { name: "Small", sf: 0.8 },
+        { name: "Regular", sf: 1.0 },
+        { name: "Large", sf: 1.25 }
+      ];
+
+      const applyScale = (layout, sf) => {
+        layout.agScale = sf;
+        layout.aglScale = sf;
+        layout.clpScale = sf;
+        layout.lssScale = sf;
+        layout.tgtScale = sf;
+        layout.tkH = Math.round(40 * sf);
+        layout.tkF = Math.round(22 * sf);
+        layout.nameplates.forEach(np => np.scale = sf);
+        return layout;
+      };
+
+      sizes.forEach(s => {
+        // Midnight Blue
+        let m = JSON.parse(initialStateStr);
+        m.agR1Bg1="#0f172a"; m.agR1Bg2="#1e3a8a"; m.aglC1="#0f172a"; m.aglC2="#1e3a8a"; m.clpC1="#0f172a"; m.clpC2="#1e3a8a"; m.tkC1="#0f172a"; m.tkC2="#1e3a8a"; m.lssC1="#0f172a"; m.lssC2="#1e3a8a"; m.tgtC1="#0f172a"; m.tgtC2="#1e3a8a";
+        m.nameplates.forEach(n=>{n.c1="#0f172a"; n.c2="#1e3a8a"; n.titleBg1="#0f172a"; n.titleBg2="#0f172a";});
+        out[`Midnight Blue ${s.name}`] = applyScale(m, s.sf);
+        
+        // Cyberpunk
+        let c = JSON.parse(initialStateStr);
+        c.ffAg="'Teko', sans-serif"; c.ffTk="'Teko', sans-serif"; c.ffL3="'Teko', sans-serif";
+        c.agR1Bg1="#9333ea"; c.agR1Bg2="#db2777"; c.aglC1="#9333ea"; c.aglC2="#db2777"; c.clpC1="#9333ea"; c.clpC2="#db2777"; c.tkC1="#9333ea"; c.tkC2="#db2777"; c.lssC1="#9333ea"; c.lssC2="#db2777"; c.tgtC1="#9333ea"; c.tgtC2="#db2777";
+        c.nameplates.forEach(n=>{n.c1="#9333ea"; n.c2="#db2777"; n.titleBg1="#9333ea"; n.titleBg2="#db2777";});
+        out[`Cyberpunk ${s.name}`] = applyScale(c, s.sf);
+
+        // Toxic Green
+        let tg = JSON.parse(initialStateStr);
+        tg.agR1Bg1="#14532d"; tg.agR1Bg2="#22c55e"; tg.aglC1="#14532d"; tg.aglC2="#22c55e"; tg.clpC1="#14532d"; tg.clpC2="#22c55e"; tg.tkC1="#14532d"; tg.tkC2="#22c55e"; tg.lssC1="#14532d"; tg.lssC2="#22c55e"; tg.tgtC1="#14532d"; tg.tgtC2="#22c55e";
+        tg.nameplates.forEach(n=>{n.c1="#14532d"; n.c2="#22c55e"; n.titleBg1="#14532d"; n.titleBg2="#22c55e";});
+        out[`Toxic Green ${s.name}`] = applyScale(tg, s.sf);
+
+        // Monochrome White
+        let min = JSON.parse(initialStateStr);
+        min.agR1Style="solid"; min.agR1Bg1="#ffffff"; min.agR1C="#000000"; min.aglStyle="solid"; min.aglC1="#ffffff"; min.aglTxtC="#000000"; min.clpStyle="solid"; min.clpC1="#ffffff"; min.clpTxtC="#000000"; min.tkStyle="solid"; min.tkC1="#ffffff"; min.tkTxtC="#000000"; min.lssStyle="solid"; min.lssC1="#ffffff"; min.lssTxtC="#000000"; min.tgtStyle="solid"; min.tgtC1="#ffffff"; min.tgtC2="#ffffff";
+        min.nameplates.forEach(n=>{n.style="solid"; n.c1="#ffffff"; n.txtNameC="#000000"; n.titleStyle="solid"; n.titleBg1="#ffffff"; n.txtTitleC="#000000";});
+        out[`Monochrome White ${s.name}`] = applyScale(min, s.sf);
+
+        // Synthwave Multicolor
+        let syn = JSON.parse(initialStateStr);
+        syn.agR1Bg1="#ff007f"; syn.agR1Bg2="#7928ca"; syn.agB2Bg1="#00f2fe"; syn.agB2Bg2="#4facfe"; syn.agB3Bg1="#f59e0b"; syn.agB3Bg2="#ea580c"; syn.aglC1="#1e3a8a"; syn.aglC2="#9333ea"; syn.clpC1="#1e3a8a"; syn.clpC2="#9333ea"; syn.tkC1="#f59e0b"; syn.tkC2="#ea580c"; syn.lssC1="#10b981"; syn.lssC2="#047857"; syn.tgtC1="#8b5cf6"; syn.tgtC2="#3b82f6";
+        syn.nameplates.forEach(n=>{n.c1="#ff007f"; n.c2="#f59e0b"; n.titleBg1="#00f2fe"; n.titleBg2="#4facfe"; n.txtTitleC="#000000";});
+        out[`Synthwave Multicolor ${s.name}`] = applyScale(syn, s.sf);
+        
+        // SUI Core (Red & Gold)
+        let sui = JSON.parse(initialStateStr);
+        out[`SUI Core ${s.name}`] = applyScale(sui, s.sf);
+      });
+
+      return out;
+    }
+    
+    function initLayouts() {
+      initialStateStr = JSON.stringify(state);
+      
+      const stored = localStorage.getItem('suiDiscLayoutsV5');
+      if(stored) savedLayouts = JSON.parse(stored); 
+      else { 
+        savedLayouts = generateBaseLayouts(); 
+        localStorage.setItem('suiDiscLayoutsV5', JSON.stringify(savedLayouts)); 
+      }
+      
+      const last = localStorage.getItem('suiLastDiscLayoutV5');
+      if(last && savedLayouts[last]) executeLoad(last); else executeLoad("Default");
+    }
+    
+    function saveLayout() { 
+      document.getElementById('modal-bg').style.display = 'block'; 
+      document.getElementById('save-warning-modal').style.display = 'block'; 
+    }
+
+    function confirmSaveLayout() {
+      savedLayouts[currentLayoutName] = JSON.parse(JSON.stringify(state)); 
+      localStorage.setItem('suiDiscLayoutsV5', JSON.stringify(savedLayouts)); 
+      closeModals();
+      alert("Layout Saved!"); 
+    }
+
+    function saveLayoutAs() {
+      const n = prompt("Layout Name:", "My Set"); if(!n) return;
+      currentLayoutName = n.trim(); savedLayouts[currentLayoutName] = JSON.parse(JSON.stringify(state));
+      localStorage.setItem('suiDiscLayoutsV5', JSON.stringify(savedLayouts)); localStorage.setItem('suiLastDiscLayoutV5', currentLayoutName);
+      document.getElementById('current-layout-badge').textContent = `Layout: ${currentLayoutName}`; alert("Saved as: " + currentLayoutName);
+    }
+
+    function executeLoad(name) {
+      if(!savedLayouts[name]) return;
+      saveHistory(); currentLayoutName = name; localStorage.setItem('suiLastDiscLayoutV5', name);
+      if(!isOverlay) document.getElementById('current-layout-badge').textContent = `Layout: ${name}`;
+      
+      const loaded = JSON.parse(JSON.stringify(savedLayouts[name]));
+      
+      // Preserve existing content and visibilities, apply ONLY styles from preset
+      const newState = { ...state };
+      
+      const styleKeys = [
+        'agScale', 'ffAg', 'agR1F', 'agR1C', 'agR1Style', 'agR1Bg1', 'agR1Bg2',
+        'agR2F', 'agR2C', 'agR2Style', 'agR2Bg1', 'agR2Bg2', 'agB2C', 'agB2Style', 'agB2Bg1', 'agB2Bg2',
+        'agR3F', 'agR3C', 'agR3Style', 'agR3Bg1', 'agR3Bg2', 'agB3C', 'agB3Style', 'agB3Bg1', 'agB3Bg2',
+        'aglScale', 'aglTxtC', 'aglStyle', 'aglC1', 'aglC2',
+        'clpScale', 'clpTxtC', 'clpStyle', 'clpC1', 'clpC2', 
+        'ffL3', 'l3FName', 'l3FTitle', 
+        'lssScale', 'lssTxtC', 'lssStyle', 'lssC1', 'lssC2',
+        'ffTk', 'tkF', 'tkTxtC', 'tkH', 'tkOp', 'tkStyle', 'tkC1', 'tkC2',
+        'brW', 'brOp', 'brStyle', 'brC1', 'brC2',
+        'tgtScale', 'ffTgtLbl', 'fTgtLbl', 'ffTgtVal', 'fTgtVal', 'tgtStyle', 'tgtC1', 'tgtC2'
+      ];
+      
+      styleKeys.forEach(k => { if(loaded[k] !== undefined) newState[k] = loaded[k]; });
+
+      if (loaded.nameplates && loaded.nameplates.length > 0 && newState.nameplates.length > 0) {
+        const pStyle = loaded.nameplates[0];
+        newState.nameplates = newState.nameplates.map(np => ({
+          ...np, scale: pStyle.scale, style: pStyle.style, c1: pStyle.c1, c2: pStyle.c2, txtNameC: pStyle.txtNameC, txtTitleC: pStyle.txtTitleC, titleStyle: pStyle.titleStyle, titleBg1: pStyle.titleBg1, titleBg2: pStyle.titleBg2
+        }));
+      }
+
+      state = newState;
+      fullRender(true); closeModals();
+    }
+    
+    function renderLayoutList() { document.getElementById('layout-list').innerHTML = Object.keys(savedLayouts).map(n => `<div class="list-item-row"><span>${n}</span> <button class="ctrl-btn highlight" onclick="executeLoad('${n}')">Load</button></div>`).join(''); }
+
+    if(!isOverlay) { initBorderPresets(); initLayouts(); }
+  </script>
+</body>
+</html>
