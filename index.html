@@ -20,12 +20,12 @@
       
       --br-w: 8px; --br-op: 1; --br-style: linear-gradient(135deg, #d31122 0%, #f6b200 100%);
       
-      --lss-scale: 1; --lss-x: calc(50% + 0px); --lss-y: 150px; --lss-bg: linear-gradient(90deg, #ff0000 0%, #cc0000 100%); --lss-txt: #ffffff;
+      --lss-scale: 1; --lss-x: 50%; --lss-y: 20%; --lss-bg: linear-gradient(90deg, #ff0000 0%, #cc0000 100%); --lss-txt: #ffffff;
       
-      --agl-scale: 1; --agl-x: calc(50% + 400px); --agl-y: 400px; --agl-bg: linear-gradient(135deg, #111 0%, #222 100%); --agl-txt: #ffffff;
+      --agl-scale: 1; --agl-x: 20%; --agl-y: 50%; --agl-bg: linear-gradient(135deg, #111 0%, #222 100%); --agl-txt: #ffffff;
       
       /* Custom List Variables */
-      --clp-scale: 1; --clp-x: calc(50% - 400px); --clp-y: 400px; --clp-bg: linear-gradient(135deg, #111 0%, #222 100%); --clp-txt: #ffffff;
+      --clp-scale: 1; --clp-x: 20%; --clp-y: 50%; --clp-bg: linear-gradient(135deg, #111 0%, #222 100%); --clp-txt: #ffffff;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
@@ -75,7 +75,7 @@
     .np-bottom { padding: 6px 24px; font-family: var(--ff-l3); font-size: var(--l3-f-title); font-weight: 700; text-transform: uppercase; letter-spacing: 2px; white-space: nowrap; }
 
     /* VERTICAL AGENDA LIST PANEL (WITH AUTO SORTING & INDICATORS) */
-    .agenda-list-wrapper { position: absolute; left: var(--agl-x); top: var(--agl-y); transform: translate(-50%, -50%) scale(var(--agl-scale)); z-index: 15; display: flex; flex-direction: column; border-radius: 8px; border: 2px solid rgba(255, 255, 255, 0.25); box-shadow: 0 8px 24px rgba(0,0,0,0.85); overflow: hidden; min-width: 320px; cursor: grab; background: var(--agl-bg); }
+    .agenda-list-wrapper { position: absolute; right: var(--agl-x); top: var(--agl-y); transform: translate(50%, -50%) scale(var(--agl-scale)); z-index: 15; display: flex; flex-direction: column; border-radius: 8px; border: 2px solid rgba(255, 255, 255, 0.25); box-shadow: 0 8px 24px rgba(0,0,0,0.85); overflow: hidden; min-width: 320px; cursor: grab; background: var(--agl-bg); }
     .agenda-list-wrapper:active { cursor: grabbing; }
     .agl-header { background: rgba(0,0,0,0.6); color: var(--agl-txt); padding: 12px; font-family: var(--ff-ag); font-size: 20px; font-weight: 900; text-align: center; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 2px solid rgba(255,255,255,0.2); }
     .agl-body { display: flex; flex-direction: column; padding: 12px; gap: 8px; }
@@ -549,7 +549,7 @@
     function togglePanel(id) { const c = document.getElementById(id); const i = document.getElementById(id + '-icon'); if (c.classList.contains('active')) { c.classList.remove('active'); i.textContent = '▼'; } else { c.classList.add('active'); i.textContent = '▲'; } }
     function togglePanelBody() { const b = document.getElementById('controls-body'); const btn = document.getElementById('btn-toggle-panel'); if (b.style.display === 'none') { b.style.display = 'flex'; btn.textContent = 'Minimize Panel'; } else { b.style.display = 'none'; btn.textContent = 'Expand Panel'; } }
 
-    // Unified Center-Offset Drag Logic
+    // Unified Drag Logic (Percentage % with Right Anchor support)
     let isDraggingEl = null, isDraggingPanel = false;
     let sX, sY, iL, iT;
 
@@ -560,9 +560,10 @@
       document.getElementById('controls').style.left = iL + 'px'; document.getElementById('controls').style.top = iT + 'px'; document.getElementById('controls').style.transform = 'none';
     });
 
-    function attachDraggable(el, updateCallback) {
+    function attachDraggable(el, updateCallback, originX = 'left') {
       if(el.dataset.dragAttached) return;
       el.dataset.dragAttached = "true";
+      el.dataset.originX = originX;
       el.addEventListener('mousedown', (e) => {
         if(isOverlay || e.button !== 0) return;
         isDraggingEl = { el, updateCallback };
@@ -575,14 +576,20 @@
         document.getElementById('controls').style.left = (iL + e.clientX - sX) + 'px'; document.getElementById('controls').style.top = (iT + e.clientY - sY) + 'px';
       }
       if(isDraggingEl) {
-        const offsetX = Math.round(e.clientX - (window.innerWidth / 2)); 
-        const py = Math.round(e.clientY);
-        
-        isDraggingEl.el.style.right = 'auto'; 
-        isDraggingEl.el.style.left = `calc(50% + ${offsetX}px)`; 
-        isDraggingEl.el.style.top = `${py}px`;
-        
-        isDraggingEl.updateCallback(offsetX, py);
+        const py = (e.clientY / window.innerHeight) * 100;
+        isDraggingEl.el.style.top = py + '%';
+
+        if (isDraggingEl.el.dataset.originX === 'right') {
+          const pxRight = ((window.innerWidth - e.clientX) / window.innerWidth) * 100;
+          isDraggingEl.el.style.left = 'auto';
+          isDraggingEl.el.style.right = pxRight + '%';
+          if(isDraggingEl.updateCallback) isDraggingEl.updateCallback(pxRight, py);
+        } else {
+          const px = (e.clientX / window.innerWidth) * 100;
+          isDraggingEl.el.style.right = 'auto';
+          isDraggingEl.el.style.left = px + '%';
+          if(isDraggingEl.updateCallback) isDraggingEl.updateCallback(px, py);
+        }
       }
     });
 
@@ -591,7 +598,7 @@
       if(isDraggingEl) { saveHistory(); isDraggingEl = null; document.getElementById('drag-hint').style.display = 'none'; syncVisuals(); }
     });
 
-    // MASTER STATE (Using Pixel Offsets)
+    // MASTER STATE (Using Percentage %)
     let state = {
       // Agenda Tracker
       agVis: true, agScale: 1, ffAg: "'Montserrat', sans-serif",
@@ -599,20 +606,20 @@
       agR2Txt: "Pre-Match Build Up", agR2F: 18, agR2C: "#ffffff", agR2Style: "split", agR2Bg1: "#d31122", agR2Bg2: "#f6b200", agB2C: "#111111", agB2Style: "solid", agB2Bg1: "#ffd700", agB2Bg2: "#ffd700",
       agR3Txt: "East Bengal Tactical Breakdown", agR3F: 16, agR3C: "#aaaaaa", agR3Style: "solid", agR3Bg1: "#111111", agR3Bg2: "#111111", agB3C: "#ffffff", agB3Style: "solid", agB3Bg1: "#3b82f6", agB3Bg2: "#3b82f6",
       
-      // Agenda Vertical List (Linked)
-      aglVis: false, aglTitle: "Today's Agenda", aglScale: 1, aglX: 400, aglY: 400, aglTxtC: "#ffffff", aglStyle: "gradient", aglC1: "#111111", aglC2: "#222222",
+      // Agenda Vertical List (Linked) - Right Anchored
+      aglVis: false, aglTitle: "Today's Agenda", aglScale: 1, aglX: 20, aglY: 50, aglTxtC: "#ffffff", aglStyle: "gradient", aglC1: "#111111", aglC2: "#222222",
       agendaItems: [ {id: 1, text: "Pre-Match Build Up", status: "now"}, {id: 2, text: "East Bengal Tactical Breakdown", status: "next"} ],
 
-      // Custom Vertical List (Free text)
-      clpVis: false, clpTitle: "Key Talking Points", clpScale: 1, clpX: -400, clpY: 400, clpTxtC: "#ffffff", clpStyle: "gradient", clpC1: "#111111", clpC2: "#222222", clpGlobalHlC: "#ffd700",
+      // Custom Vertical List (Free text) - Left Anchored
+      clpVis: false, clpTitle: "Key Talking Points", clpScale: 1, clpX: 20, clpY: 50, clpTxtC: "#ffffff", clpStyle: "gradient", clpC1: "#111111", clpC2: "#222222", clpGlobalHlC: "#ffd700",
       clpItems: [ {id: 1, text: "Strong Attack", hl: false, hlC: "#ffd700"} ],
 
-      // Nameplates
+      // Nameplates - Left Anchored
       ffL3: "'Montserrat', sans-serif", l3FName: 26, l3FTitle: 14,
-      nameplates: [ { id: 1, name: "Ankit Bhattacharjee", title: "Host | SUI", vis: true, x: -400, y: 800, scale: 1, style: "gradient", c1: "#d31122", c2: "#f6b200", txtNameC: "#ffffff", txtTitleC: "#dddddd", titleStyle: "solid", titleBg1: "#0c0e12", titleBg2: "#0c0e12" } ],
+      nameplates: [ { id: 1, name: "Ankit Bhattacharjee", title: "Host | SUI", vis: true, x: 20, y: 80, scale: 1, style: "gradient", c1: "#d31122", c2: "#f6b200", txtNameC: "#ffffff", txtTitleC: "#dddddd", titleStyle: "solid", titleBg1: "#0c0e12", titleBg2: "#0c0e12" } ],
       
-      // LSS
-      lssVis: true, lssAnim: true, lssScale: 1, lssX: 0, lssY: 150, lssStyle: "gradient", lssC1: "#ff0000", lssC2: "#cc0000", lssTxtC: "#ffffff",
+      // LSS - Left Anchored
+      lssVis: true, lssAnim: true, lssScale: 1, lssX: 50, lssY: 20, lssStyle: "gradient", lssC1: "#ff0000", lssC2: "#cc0000", lssTxtC: "#ffffff",
       
       // Ticker
       tkVis: true, tkScroll: true, tkTxt: "Welcome to Sports Unplugged India! Please Like and Subscribe.", ffTk: "'Montserrat', sans-serif", tkF: 22, tkTxtC: "#ffffff", tkH: 40, tkOp: 0.9, tkStyle: "gradient", tkC1: "#1a202c", tkC2: "#2d3748",
@@ -677,7 +684,7 @@
     // Nameplates
     function addNameplate() {
       saveHistory();
-      state.nameplates.push({ id: Date.now(), name: "New Guest", title: "Analyst", vis: true, x: -200, y: 800, scale: 1, style: "gradient", c1: "#1e3a8a", c2: "#3b82f6", txtNameC: "#ffffff", txtTitleC: "#dddddd", titleStyle: "solid", titleBg1: "#0c0e12", titleBg2: "#0c0e12" });
+      state.nameplates.push({ id: Date.now(), name: "New Guest", title: "Analyst", vis: true, x: 20, y: 80, scale: 1, style: "gradient", c1: "#1e3a8a", c2: "#3b82f6", txtNameC: "#ffffff", txtTitleC: "#dddddd", titleStyle: "solid", titleBg1: "#0c0e12", titleBg2: "#0c0e12" });
       fullRender(true); syncVisuals();
     }
     function removeNameplate(id) { saveHistory(); state.nameplates = state.nameplates.filter(n => n.id !== id); fullRender(true); syncVisuals(); }
@@ -820,19 +827,24 @@
       r.style.setProperty('--ag-b3-c', state.agB3C); r.style.setProperty('--ag-b3-bg', getGrad(state.agB3Style, state.agB3Bg1, state.agB3Bg2));
       
       r.style.setProperty('--agl-scale', state.aglScale); r.style.setProperty('--agl-txt', state.aglTxtC); r.style.setProperty('--agl-bg', getGrad(state.aglStyle, state.aglC1, state.aglC2));
+      
+      // Inline memory lock for Agenda (Right Anchor)
       const aglEl = document.getElementById('agl-wrapper');
-      if (aglEl) { aglEl.style.right = 'auto'; aglEl.style.left = `calc(50% + ${state.aglX}px)`; aglEl.style.top = `${state.aglY}px`; }
+      if (aglEl) { aglEl.style.left = 'auto'; aglEl.style.right = state.aglX+'%'; aglEl.style.top = state.aglY+'%'; }
       
       r.style.setProperty('--clp-scale', state.clpScale); r.style.setProperty('--clp-txt', state.clpTxtC); r.style.setProperty('--clp-bg', getGrad(state.clpStyle, state.clpC1, state.clpC2));
+      
+      // Inline memory lock for Custom List (Left Anchor)
       const clpEl = document.getElementById('clp-wrapper');
-      if (clpEl) { clpEl.style.right = 'auto'; clpEl.style.left = `calc(50% + ${state.clpX}px)`; clpEl.style.top = `${state.clpY}px`; }
+      if (clpEl) { clpEl.style.right = 'auto'; clpEl.style.left = state.clpX+'%'; clpEl.style.top = state.clpY+'%'; }
       
       r.style.setProperty('--ff-l3', state.ffL3); r.style.setProperty('--l3-f-name', state.l3FName+'px'); r.style.setProperty('--l3-f-title', state.l3FTitle+'px');
       
       state.nameplates.forEach(np => {
         const el = document.getElementById(`np-overlay-${np.id}`);
         if(el) { 
-          el.style.right = 'auto'; el.style.left = `calc(50% + ${np.x}px)`; el.style.top = np.y+'px'; el.style.transform = `translate(-50%, -50%) scale(${np.scale})`; 
+          el.style.right = 'auto'; el.style.left = np.x+'%'; el.style.top = np.y+'%'; 
+          el.style.transform = `translate(-50%, -50%) scale(${np.scale})`; 
           const topEl = el.querySelector('.np-top');
           const botEl = el.querySelector('.np-bottom');
           if(topEl) { topEl.style.background = getGrad(np.style, np.c1, np.c2); topEl.style.color = np.txtNameC; }
@@ -841,8 +853,10 @@
       });
 
       r.style.setProperty('--lss-scale', state.lssScale); r.style.setProperty('--lss-bg', getGrad(state.lssStyle, state.lssC1, state.lssC2)); r.style.setProperty('--lss-txt', state.lssTxtC);
+      
+      // Inline memory lock for LSS (Left Anchor)
       const lssEl = document.getElementById('lss-widget');
-      if (lssEl) { lssEl.style.right = 'auto'; lssEl.style.left = `calc(50% + ${state.lssX}px)`; lssEl.style.top = `${state.lssY}px`; }
+      if (lssEl) { lssEl.style.right = 'auto'; lssEl.style.left = state.lssX+'%'; lssEl.style.top = state.lssY+'%'; }
       
       r.style.setProperty('--tk-h', state.tkH+'px'); r.style.setProperty('--ff-tk', state.ffTk); r.style.setProperty('--tk-f', state.tkF+'px'); r.style.setProperty('--tk-txt-c', state.tkTxtC); r.style.setProperty('--tk-op', state.tkOp);
       document.getElementById('ticker-bg').style.background = getGrad(state.tkStyle, state.tkC1, state.tkC2);
@@ -898,7 +912,8 @@
         let post = i.status === 'next' ? '<div class="ag-up-next">UP NEXT</div>' : (i.status === 'completed' ? '<div class="ag-completed">✔</div>' : '');
         return `<div class="agl-item status-${i.status}">${pre}<span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${i.text}</span>${post}</div>`;
       }).join('');
-      attachDraggable(document.getElementById('agl-wrapper'), (x, y) => { state.aglX = x; state.aglY = y; });
+      // Bind Right Anchor
+      attachDraggable(document.getElementById('agl-wrapper'), (x, y) => { state.aglX = x; state.aglY = y; }, 'right');
 
       document.getElementById('clp-wrapper').style.display = state.clpVis ? 'flex' : 'none';
       document.getElementById('clp-title-display').textContent = state.clpTitle;
@@ -909,7 +924,7 @@
       attachDraggable(document.getElementById('clp-wrapper'), (x, y) => { state.clpX = x; state.clpY = y; });
 
       document.getElementById('overlay-nameplates').innerHTML = state.nameplates.map(np => 
-        np.vis ? `<div class="nameplate-wrapper" id="np-overlay-${np.id}" style="right:auto; left:calc(50% + ${np.x}px); top:${np.y}px;"><div class="np-top" style="color:${np.txtNameC}; background:${getGrad(np.style, np.c1, np.c2)};">${np.name}</div><div class="np-bottom" style="color:${np.txtTitleC}; background:${getGrad(np.titleStyle, np.titleBg1, np.titleBg2)};">${np.title}</div></div>` : ''
+        np.vis ? `<div class="nameplate-wrapper" id="np-overlay-${np.id}" style="right:auto; left:${np.x}%; top:${np.y}%;"><div class="np-top" style="color:${np.txtNameC}; background:${getGrad(np.style, np.c1, np.c2)};">${np.name}</div><div class="np-bottom" style="color:${np.txtTitleC}; background:${getGrad(np.titleStyle, np.titleBg1, np.titleBg2)};">${np.title}</div></div>` : ''
       ).join('');
       state.nameplates.forEach(np => {
         const el = document.getElementById(`np-overlay-${np.id}`);
@@ -1129,16 +1144,16 @@
       const newState = { ...state };
       
       const styleKeys = [
-        'agScale', 'ffAg', 'agR1F', 'agR1C', 'agR1Style', 'agR1Bg1', 'agR1Bg2',
+        'agVis', 'agScale', 'ffAg', 'agR1F', 'agR1C', 'agR1Style', 'agR1Bg1', 'agR1Bg2',
         'agR2F', 'agR2C', 'agR2Style', 'agR2Bg1', 'agR2Bg2', 'agB2C', 'agB2Style', 'agB2Bg1', 'agB2Bg2',
         'agR3F', 'agR3C', 'agR3Style', 'agR3Bg1', 'agR3Bg2', 'agB3C', 'agB3Style', 'agB3Bg1', 'agB3Bg2',
-        'aglScale', 'aglTxtC', 'aglStyle', 'aglC1', 'aglC2', 'aglX', 'aglY',
-        'clpScale', 'clpTxtC', 'clpStyle', 'clpC1', 'clpC2', 'clpX', 'clpY',
+        'aglVis', 'aglScale', 'aglTxtC', 'aglStyle', 'aglC1', 'aglC2', 'aglX', 'aglY',
+        'clpVis', 'clpScale', 'clpTxtC', 'clpStyle', 'clpC1', 'clpC2', 'clpX', 'clpY',
         'ffL3', 'l3FName', 'l3FTitle', 
-        'lssScale', 'lssTxtC', 'lssStyle', 'lssC1', 'lssC2', 'lssX', 'lssY',
-        'ffTk', 'tkF', 'tkTxtC', 'tkH', 'tkOp', 'tkStyle', 'tkC1', 'tkC2',
-        'brW', 'brOp', 'brStyle', 'brC1', 'brC2',
-        'tgtScale', 'ffTgtLbl', 'fTgtLbl', 'ffTgtVal', 'fTgtVal', 'tgtStyle', 'tgtC1', 'tgtC2'
+        'lssVis', 'lssScale', 'lssTxtC', 'lssStyle', 'lssC1', 'lssC2', 'lssX', 'lssY',
+        'tkVis', 'tkScroll', 'ffTk', 'tkF', 'tkTxtC', 'tkH', 'tkOp', 'tkStyle', 'tkC1', 'tkC2',
+        'brVis', 'brW', 'brOp', 'brStyle', 'brC1', 'brC2',
+        'tgtVis', 'tgtScale', 'ffTgtLbl', 'fTgtLbl', 'ffTgtVal', 'fTgtVal', 'tgtStyle', 'tgtC1', 'tgtC2'
       ];
       
       styleKeys.forEach(k => { if(loaded[k] !== undefined) newState[k] = loaded[k]; });
