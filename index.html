@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Sports Unplugged India | Live Discussion Suite V5.0</title>
+  <title>Sports Unplugged India | Live Discussion Suite V5.1</title>
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Fira+Sans:wght@400;700&family=Inter:wght@400;700;800&family=Lato:wght@400;700;900&family=Merriweather:wght@400;700;900&family=Montserrat:wght@400;600;700;800&family=Nunito:wght@400;700;800&family=Open+Sans:wght@400;700;800&family=Oswald:wght@400;700&family=PT+Sans:wght@400;700&family=Playfair+Display:wght@400;700;800&family=Poppins:wght@400;700;800&family=Raleway:wght@400;700;800&family=Roboto:wght@400;700;900&family=Rubik:wght@400;700;800&family=Teko:wght@400;600;700&family=Ubuntu:wght@400;700&family=Work+Sans:wght@400;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.pubnub.com/sdk/javascript/pubnub.7.2.2.min.js"></script>
   <style>
@@ -20,12 +20,12 @@
       
       --br-w: 8px; --br-op: 1; --br-style: linear-gradient(135deg, #d31122 0%, #f6b200 100%);
       
-      --lss-scale: 1; --lss-x: 50%; --lss-y: 20%; --lss-bg: linear-gradient(90deg, #ff0000 0%, #cc0000 100%); --lss-txt: #ffffff;
+      --lss-scale: 1; --lss-x: calc(50% + 0px); --lss-y: 150px; --lss-bg: linear-gradient(90deg, #ff0000 0%, #cc0000 100%); --lss-txt: #ffffff;
       
-      --agl-scale: 1; --agl-x: 80%; --agl-y: 50%; --agl-bg: linear-gradient(135deg, #111 0%, #222 100%); --agl-txt: #ffffff;
+      --agl-scale: 1; --agl-x: calc(50% + 400px); --agl-y: 400px; --agl-bg: linear-gradient(135deg, #111 0%, #222 100%); --agl-txt: #ffffff;
       
       /* Custom List Variables */
-      --clp-scale: 1; --clp-x: 20%; --clp-y: 50%; --clp-bg: linear-gradient(135deg, #111 0%, #222 100%); --clp-txt: #ffffff;
+      --clp-scale: 1; --clp-x: calc(50% - 400px); --clp-y: 400px; --clp-bg: linear-gradient(135deg, #111 0%, #222 100%); --clp-txt: #ffffff;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
@@ -96,7 +96,7 @@
     .clp-item.highlighted { transform: scale(1.02); box-shadow: 0 4px 10px rgba(0,0,0,0.3); text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 2px 2px 4px rgba(0,0,0,0.8); }
 
     /* LSS WIDGET */
-    .lss-wrapper { position: absolute; left: var(--lss-x); top: var(--lss-y); transform: translate(-50%, -50%) scale(var(--lss-scale)); background: var(--lss-bg); border-radius: 30px; padding: 12px 30px; color: var(--lss-txt); font-family: 'Montserrat', sans-serif; font-size: 20px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 2px solid rgba(255,255,255,0.3); display: flex; gap: 15px; align-items: center; z-index: 90; cursor: grab; }
+    .lss-wrapper { position: absolute; left: var(--lss-x); top: var(--lss-y); transform: translate(-50%, -50%) scale(var(--lss-scale)); background: var(--lss-bg); border-radius: 30px; padding: 12px 30px; color: var(--lss-txt); font-family: 'Montserrat', sans-serif; font-size: 20px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 2px solid rgba(255,255,255,0.3); display: flex; gap: 15px; align-items: center; z-index: 90; cursor: grab; white-space: nowrap; width: max-content; flex-wrap: nowrap; }
     .lss-wrapper:active { cursor: grabbing; }
     .lss-icon { font-size: 24px; }
     .lss-animated { animation: lss-pulse 2s infinite cubic-bezier(0.4, 0, 0.6, 1); }
@@ -253,7 +253,7 @@
   <div class="controller-panel" id="controls">
     <div class="ctrl-master-header">
       <div style="display: flex; align-items: center; pointer-events: none;">
-        <span style="font-weight: 900; font-size: 20px; color: #fff; letter-spacing: 1.5px;">SUI DISCUSSION SUITE V5.0</span>
+        <span style="font-weight: 900; font-size: 20px; color: #fff; letter-spacing: 1.5px;">SUI DISCUSSION SUITE V5.1</span>
         <span class="layout-name-badge" id="current-layout-badge">Layout: Default</span>
       </div>
       <div style="display: flex; gap: 6px; pointer-events: auto;">
@@ -262,6 +262,11 @@
         <button class="ctrl-btn" onclick="redo()">Redo</button>
         <button class="ctrl-btn warning" onclick="reset()">Reset</button>
         <button class="ctrl-btn sync-btn" onclick="syncVisuals()">SYNC TO STREAM</button>
+        
+        <button class="ctrl-btn special" onclick="exportMemory()" title="Download a backup" style="background:#0284c7; border-color:#0369a1;">Export</button>
+        <button class="ctrl-btn special" onclick="document.getElementById('import-file').click()" title="Import a backup" style="background:#0284c7; border-color:#0369a1;">Import</button>
+        <input type="file" id="import-file" style="display: none;" accept=".json" onchange="importMemory(event)">
+        
         <button class="ctrl-btn" onclick="saveLayout()">Save</button>
         <button class="ctrl-btn" onclick="saveLayoutAs()">Save As</button>
         <button class="ctrl-btn" onclick="openLayoutModal()">Load</button>
@@ -357,6 +362,13 @@
           <div class="ctrl-row" style="margin-bottom: 12px; justify-content:space-between;">
             <label style="display:flex; align-items:center; gap:8px; font-weight:bold; font-size:13px;"><input type="checkbox" id="clp-vis" onchange="applyInstant()"> Show Custom List</label>
             <div style="display:flex; gap:8px; align-items:center;">
+              <select id="load-clp-list" class="font-select" onchange="if(this.value) { loadClpFromMemory(this.value); this.value=''; }"><option value="">Load Saved...</option></select>
+              <button class="ctrl-btn warning" style="padding:2px 8px; font-size:10px;" onclick="deleteClpFromMemory()" title="Delete currently loaded list">Del</button>
+              <button class="ctrl-btn" style="padding:2px 8px; font-size:10px;" onclick="saveClpToMemory()">Save List</button>
+            </div>
+          </div>
+          <div class="ctrl-row" style="margin-bottom: 12px; justify-content:space-between;">
+            <div style="display:flex; gap:8px; align-items:center;">
               <span style="font-size:10px; font-weight:bold; color:#ccc;">GLOBAL HL:</span>
               <input type="color" id="clp-global-hlc" oninput="applyGlobalClpHighlight()" style="width:24px; height:24px; padding:0; border:none; cursor:pointer;" title="Global Highlight Color">
               <input type="text" class="auto-text" id="clp-title" value="Team Strengths" style="width:160px;" oninput="applyInstant()">
@@ -407,7 +419,7 @@
           <div class="slider-group">
             <div class="slider-container"><span>Scale</span><input type="range" id="lss-scale" min="0.3" max="2" step="0.05" oninput="applyVisualsLocally()"></div>
             <div class="slider-container"><span>Text C</span><input type="color" id="lss-txt-c" oninput="applyVisualsLocally()"></div>
-            <div class="slider-container"><span>BG Style</span><select id="lss-style" class="font-select" onchange="applyVisualsLocally()"><option value="solid">Solid</option><option value="split">Split</option><option value="gradient">Grad</option></select></div>
+            <div class="slider-container"><span>BG Style</span><select id="lss-style" class="font-select" onchange="applyVisualsLocally()"><option value="solid">Solid</option><option value="split">Split</option><option value="gradient" selected>Grad</option></select></div>
             <div class="slider-container"><span>BG C1</span><input type="color" id="lss-c1" oninput="applyVisualsLocally()"></div>
             <div class="slider-container"><span>BG C2</span><input type="color" id="lss-c2" oninput="applyVisualsLocally()"></div>
             <span style="color:#eab308; font-size:12px; font-weight:bold; margin-left:auto;">* Drag widget to move</span>
@@ -537,7 +549,7 @@
     function togglePanel(id) { const c = document.getElementById(id); const i = document.getElementById(id + '-icon'); if (c.classList.contains('active')) { c.classList.remove('active'); i.textContent = '▼'; } else { c.classList.add('active'); i.textContent = '▲'; } }
     function togglePanelBody() { const b = document.getElementById('controls-body'); const btn = document.getElementById('btn-toggle-panel'); if (b.style.display === 'none') { b.style.display = 'flex'; btn.textContent = 'Minimize Panel'; } else { b.style.display = 'none'; btn.textContent = 'Expand Panel'; } }
 
-    // Unified Drag Logic
+    // Unified Center-Offset Drag Logic
     let isDraggingEl = null, isDraggingPanel = false;
     let sX, sY, iL, iT;
 
@@ -563,9 +575,14 @@
         document.getElementById('controls').style.left = (iL + e.clientX - sX) + 'px'; document.getElementById('controls').style.top = (iT + e.clientY - sY) + 'px';
       }
       if(isDraggingEl) {
-        const px = (e.clientX / window.innerWidth) * 100; const py = (e.clientY / window.innerHeight) * 100;
-        isDraggingEl.el.style.left = px + '%'; isDraggingEl.el.style.top = py + '%';
-        isDraggingEl.updateCallback(px, py);
+        const offsetX = Math.round(e.clientX - (window.innerWidth / 2)); 
+        const py = Math.round(e.clientY);
+        
+        isDraggingEl.el.style.right = 'auto'; 
+        isDraggingEl.el.style.left = `calc(50% + ${offsetX}px)`; 
+        isDraggingEl.el.style.top = `${py}px`;
+        
+        isDraggingEl.updateCallback(offsetX, py);
       }
     });
 
@@ -574,7 +591,7 @@
       if(isDraggingEl) { saveHistory(); isDraggingEl = null; document.getElementById('drag-hint').style.display = 'none'; syncVisuals(); }
     });
 
-    // MASTER STATE
+    // MASTER STATE (Using Pixel Offsets)
     let state = {
       // Agenda Tracker
       agVis: true, agScale: 1, ffAg: "'Montserrat', sans-serif",
@@ -583,19 +600,19 @@
       agR3Txt: "East Bengal Tactical Breakdown", agR3F: 16, agR3C: "#aaaaaa", agR3Style: "solid", agR3Bg1: "#111111", agR3Bg2: "#111111", agB3C: "#ffffff", agB3Style: "solid", agB3Bg1: "#3b82f6", agB3Bg2: "#3b82f6",
       
       // Agenda Vertical List (Linked)
-      aglVis: false, aglTitle: "Today's Agenda", aglScale: 1, aglX: 80, aglY: 50, aglTxtC: "#ffffff", aglStyle: "gradient", aglC1: "#111111", aglC2: "#222222",
+      aglVis: false, aglTitle: "Today's Agenda", aglScale: 1, aglX: 400, aglY: 400, aglTxtC: "#ffffff", aglStyle: "gradient", aglC1: "#111111", aglC2: "#222222",
       agendaItems: [ {id: 1, text: "Pre-Match Build Up", status: "now"}, {id: 2, text: "East Bengal Tactical Breakdown", status: "next"} ],
 
       // Custom Vertical List (Free text)
-      clpVis: false, clpTitle: "Key Talking Points", clpScale: 1, clpX: 20, clpY: 50, clpTxtC: "#ffffff", clpStyle: "gradient", clpC1: "#111111", clpC2: "#222222", clpGlobalHlC: "#ffd700",
+      clpVis: false, clpTitle: "Key Talking Points", clpScale: 1, clpX: -400, clpY: 400, clpTxtC: "#ffffff", clpStyle: "gradient", clpC1: "#111111", clpC2: "#222222", clpGlobalHlC: "#ffd700",
       clpItems: [ {id: 1, text: "Strong Attack", hl: false, hlC: "#ffd700"} ],
 
       // Nameplates
       ffL3: "'Montserrat', sans-serif", l3FName: 26, l3FTitle: 14,
-      nameplates: [ { id: 1, name: "Ankit Bhattacharjee", title: "Host | SUI", vis: true, x: 20, y: 80, scale: 1, style: "gradient", c1: "#d31122", c2: "#f6b200", txtNameC: "#ffffff", txtTitleC: "#dddddd", titleStyle: "solid", titleBg1: "#0c0e12", titleBg2: "#0c0e12" } ],
+      nameplates: [ { id: 1, name: "Ankit Bhattacharjee", title: "Host | SUI", vis: true, x: -400, y: 800, scale: 1, style: "gradient", c1: "#d31122", c2: "#f6b200", txtNameC: "#ffffff", txtTitleC: "#dddddd", titleStyle: "solid", titleBg1: "#0c0e12", titleBg2: "#0c0e12" } ],
       
       // LSS
-      lssVis: true, lssAnim: true, lssScale: 1, lssX: 50, lssY: 20, lssStyle: "gradient", lssC1: "#ff0000", lssC2: "#cc0000", lssTxtC: "#ffffff",
+      lssVis: true, lssAnim: true, lssScale: 1, lssX: 0, lssY: 150, lssStyle: "gradient", lssC1: "#ff0000", lssC2: "#cc0000", lssTxtC: "#ffffff",
       
       // Ticker
       tkVis: true, tkScroll: true, tkTxt: "Welcome to Sports Unplugged India! Please Like and Subscribe.", ffTk: "'Montserrat', sans-serif", tkF: 22, tkTxtC: "#ffffff", tkH: 40, tkOp: 0.9, tkStyle: "gradient", tkC1: "#1a202c", tkC2: "#2d3748",
@@ -616,10 +633,51 @@
       if(style === 'solid') return c1; if(style === 'split') return `linear-gradient(90deg, ${c1} 50%, ${c2} 50%)`; return `linear-gradient(135deg, ${c1} 0%, ${c2} 100%)`;
     }
 
+    // Custom Vertical List Memory
+    let savedCustomLists = {};
+    function initCustomListMemory() {
+      const stored = localStorage.getItem('suiSavedCustomLists');
+      if (stored) savedCustomLists = JSON.parse(stored);
+      updateClpDatalist();
+    }
+    function updateClpDatalist() {
+      const sel = document.getElementById('load-clp-list');
+      if (!sel) return;
+      sel.innerHTML = '<option value="">Load Saved...</option>' + Object.keys(savedCustomLists).map(k => `<option value="${k}">${k}</option>`).join('');
+    }
+    function saveClpToMemory() {
+      const name = state.clpTitle.trim() || prompt("Enter a name for this custom list:", "My List");
+      if (!name) return;
+      savedCustomLists[name] = { title: state.clpTitle, items: JSON.parse(JSON.stringify(state.clpItems)), globalHlC: state.clpGlobalHlC };
+      localStorage.setItem('suiSavedCustomLists', JSON.stringify(savedCustomLists));
+      updateClpDatalist();
+      alert(`Saved custom list: ${name}`);
+    }
+    function loadClpFromMemory(name) {
+      if(!savedCustomLists[name]) return;
+      saveHistory();
+      state.clpTitle = savedCustomLists[name].title;
+      state.clpItems = JSON.parse(JSON.stringify(savedCustomLists[name].items));
+      state.clpGlobalHlC = savedCustomLists[name].globalHlC || "#ffd700";
+      fullRender(true); syncVisuals();
+    }
+    function deleteClpFromMemory() {
+      const name = state.clpTitle.trim();
+      if(!name || !savedCustomLists[name]) {
+        alert(`No saved list found with the title "${name}". Please load it or type its exact title to delete.`);
+        return;
+      }
+      if(confirm(`Are you sure you want to delete the list "${name}"?`)) {
+        delete savedCustomLists[name];
+        localStorage.setItem('suiSavedCustomLists', JSON.stringify(savedCustomLists));
+        updateClpDatalist();
+      }
+    }
+
     // Nameplates
     function addNameplate() {
       saveHistory();
-      state.nameplates.push({ id: Date.now(), name: "New Guest", title: "Analyst", vis: true, x: 80, y: 80, scale: 1, style: "gradient", c1: "#1e3a8a", c2: "#3b82f6", txtNameC: "#ffffff", txtTitleC: "#dddddd", titleStyle: "solid", titleBg1: "#0c0e12", titleBg2: "#0c0e12" });
+      state.nameplates.push({ id: Date.now(), name: "New Guest", title: "Analyst", vis: true, x: -200, y: 800, scale: 1, style: "gradient", c1: "#1e3a8a", c2: "#3b82f6", txtNameC: "#ffffff", txtTitleC: "#dddddd", titleStyle: "solid", titleBg1: "#0c0e12", titleBg2: "#0c0e12" });
       fullRender(true); syncVisuals();
     }
     function removeNameplate(id) { saveHistory(); state.nameplates = state.nameplates.filter(n => n.id !== id); fullRender(true); syncVisuals(); }
@@ -761,16 +819,20 @@
       r.style.setProperty('--ag-r3-f', state.agR3F+'px'); r.style.setProperty('--ag-r3-c', state.agR3C); r.style.setProperty('--ag-r3-bg', getGrad(state.agR3Style, state.agR3Bg1, state.agR3Bg2));
       r.style.setProperty('--ag-b3-c', state.agB3C); r.style.setProperty('--ag-b3-bg', getGrad(state.agB3Style, state.agB3Bg1, state.agB3Bg2));
       
-      r.style.setProperty('--agl-scale', state.aglScale); r.style.setProperty('--agl-x', state.aglX+'%'); r.style.setProperty('--agl-y', state.aglY+'%'); r.style.setProperty('--agl-txt', state.aglTxtC); r.style.setProperty('--agl-bg', getGrad(state.aglStyle, state.aglC1, state.aglC2));
+      r.style.setProperty('--agl-scale', state.aglScale); r.style.setProperty('--agl-txt', state.aglTxtC); r.style.setProperty('--agl-bg', getGrad(state.aglStyle, state.aglC1, state.aglC2));
+      const aglEl = document.getElementById('agl-wrapper');
+      if (aglEl) { aglEl.style.right = 'auto'; aglEl.style.left = `calc(50% + ${state.aglX}px)`; aglEl.style.top = `${state.aglY}px`; }
       
-      r.style.setProperty('--clp-scale', state.clpScale); r.style.setProperty('--clp-x', state.clpX+'%'); r.style.setProperty('--clp-y', state.clpY+'%'); r.style.setProperty('--clp-txt', state.clpTxtC); r.style.setProperty('--clp-bg', getGrad(state.clpStyle, state.clpC1, state.clpC2));
+      r.style.setProperty('--clp-scale', state.clpScale); r.style.setProperty('--clp-txt', state.clpTxtC); r.style.setProperty('--clp-bg', getGrad(state.clpStyle, state.clpC1, state.clpC2));
+      const clpEl = document.getElementById('clp-wrapper');
+      if (clpEl) { clpEl.style.right = 'auto'; clpEl.style.left = `calc(50% + ${state.clpX}px)`; clpEl.style.top = `${state.clpY}px`; }
       
       r.style.setProperty('--ff-l3', state.ffL3); r.style.setProperty('--l3-f-name', state.l3FName+'px'); r.style.setProperty('--l3-f-title', state.l3FTitle+'px');
       
       state.nameplates.forEach(np => {
         const el = document.getElementById(`np-overlay-${np.id}`);
         if(el) { 
-          el.style.left = np.x+'%'; el.style.top = np.y+'%'; el.style.transform = `translate(-50%, -50%) scale(${np.scale})`; 
+          el.style.right = 'auto'; el.style.left = `calc(50% + ${np.x}px)`; el.style.top = np.y+'px'; el.style.transform = `translate(-50%, -50%) scale(${np.scale})`; 
           const topEl = el.querySelector('.np-top');
           const botEl = el.querySelector('.np-bottom');
           if(topEl) { topEl.style.background = getGrad(np.style, np.c1, np.c2); topEl.style.color = np.txtNameC; }
@@ -778,7 +840,9 @@
         }
       });
 
-      r.style.setProperty('--lss-scale', state.lssScale); r.style.setProperty('--lss-x', state.lssX+'%'); r.style.setProperty('--lss-y', state.lssY+'%'); r.style.setProperty('--lss-bg', getGrad(state.lssStyle, state.lssC1, state.lssC2)); r.style.setProperty('--lss-txt', state.lssTxtC);
+      r.style.setProperty('--lss-scale', state.lssScale); r.style.setProperty('--lss-bg', getGrad(state.lssStyle, state.lssC1, state.lssC2)); r.style.setProperty('--lss-txt', state.lssTxtC);
+      const lssEl = document.getElementById('lss-widget');
+      if (lssEl) { lssEl.style.right = 'auto'; lssEl.style.left = `calc(50% + ${state.lssX}px)`; lssEl.style.top = `${state.lssY}px`; }
       
       r.style.setProperty('--tk-h', state.tkH+'px'); r.style.setProperty('--ff-tk', state.ffTk); r.style.setProperty('--tk-f', state.tkF+'px'); r.style.setProperty('--tk-txt-c', state.tkTxtC); r.style.setProperty('--tk-op', state.tkOp);
       document.getElementById('ticker-bg').style.background = getGrad(state.tkStyle, state.tkC1, state.tkC2);
@@ -845,7 +909,7 @@
       attachDraggable(document.getElementById('clp-wrapper'), (x, y) => { state.clpX = x; state.clpY = y; });
 
       document.getElementById('overlay-nameplates').innerHTML = state.nameplates.map(np => 
-        np.vis ? `<div class="nameplate-wrapper" id="np-overlay-${np.id}" style="left:${np.x}%; top:${np.y}%;"><div class="np-top" style="color:${np.txtNameC}; background:${getGrad(np.style, np.c1, np.c2)};">${np.name}</div><div class="np-bottom" style="color:${np.txtTitleC}; background:${getGrad(np.titleStyle, np.titleBg1, np.titleBg2)};">${np.title}</div></div>` : ''
+        np.vis ? `<div class="nameplate-wrapper" id="np-overlay-${np.id}" style="right:auto; left:calc(50% + ${np.x}px); top:${np.y}px;"><div class="np-top" style="color:${np.txtNameC}; background:${getGrad(np.style, np.c1, np.c2)};">${np.name}</div><div class="np-bottom" style="color:${np.txtTitleC}; background:${getGrad(np.titleStyle, np.titleBg1, np.titleBg2)};">${np.title}</div></div>` : ''
       ).join('');
       state.nameplates.forEach(np => {
         const el = document.getElementById(`np-overlay-${np.id}`);
@@ -1062,17 +1126,16 @@
       
       const loaded = JSON.parse(JSON.stringify(savedLayouts[name]));
       
-      // Preserve existing content and visibilities, apply ONLY styles from preset
       const newState = { ...state };
       
       const styleKeys = [
         'agScale', 'ffAg', 'agR1F', 'agR1C', 'agR1Style', 'agR1Bg1', 'agR1Bg2',
         'agR2F', 'agR2C', 'agR2Style', 'agR2Bg1', 'agR2Bg2', 'agB2C', 'agB2Style', 'agB2Bg1', 'agB2Bg2',
         'agR3F', 'agR3C', 'agR3Style', 'agR3Bg1', 'agR3Bg2', 'agB3C', 'agB3Style', 'agB3Bg1', 'agB3Bg2',
-        'aglScale', 'aglTxtC', 'aglStyle', 'aglC1', 'aglC2',
-        'clpScale', 'clpTxtC', 'clpStyle', 'clpC1', 'clpC2', 
+        'aglScale', 'aglTxtC', 'aglStyle', 'aglC1', 'aglC2', 'aglX', 'aglY',
+        'clpScale', 'clpTxtC', 'clpStyle', 'clpC1', 'clpC2', 'clpX', 'clpY',
         'ffL3', 'l3FName', 'l3FTitle', 
-        'lssScale', 'lssTxtC', 'lssStyle', 'lssC1', 'lssC2',
+        'lssScale', 'lssTxtC', 'lssStyle', 'lssC1', 'lssC2', 'lssX', 'lssY',
         'ffTk', 'tkF', 'tkTxtC', 'tkH', 'tkOp', 'tkStyle', 'tkC1', 'tkC2',
         'brW', 'brOp', 'brStyle', 'brC1', 'brC2',
         'tgtScale', 'ffTgtLbl', 'fTgtLbl', 'ffTgtVal', 'fTgtVal', 'tgtStyle', 'tgtC1', 'tgtC2'
@@ -1080,20 +1143,85 @@
       
       styleKeys.forEach(k => { if(loaded[k] !== undefined) newState[k] = loaded[k]; });
 
-      if (loaded.nameplates && loaded.nameplates.length > 0 && newState.nameplates.length > 0) {
-        const pStyle = loaded.nameplates[0];
-        newState.nameplates = newState.nameplates.map(np => ({
-          ...np, scale: pStyle.scale, style: pStyle.style, c1: pStyle.c1, c2: pStyle.c2, txtNameC: pStyle.txtNameC, txtTitleC: pStyle.txtTitleC, titleStyle: pStyle.titleStyle, titleBg1: pStyle.titleBg1, titleBg2: pStyle.titleBg2
-        }));
+      // Explicit Deep Copy of Arrays from Saved Layout
+      if (loaded.nameplates) {
+        newState.nameplates = JSON.parse(JSON.stringify(loaded.nameplates));
+      }
+      if (loaded.clpItems) {
+        newState.clpItems = JSON.parse(JSON.stringify(loaded.clpItems));
+      }
+      if (loaded.clpTitle !== undefined) newState.clpTitle = loaded.clpTitle;
+      if (loaded.clpGlobalHlC !== undefined) newState.clpGlobalHlC = loaded.clpGlobalHlC;
+      if (loaded.agendaItems) {
+        newState.agendaItems = JSON.parse(JSON.stringify(loaded.agendaItems));
       }
 
       state = newState;
       fullRender(true); closeModals();
     }
     
-    function renderLayoutList() { document.getElementById('layout-list').innerHTML = Object.keys(savedLayouts).map(n => `<div class="list-item-row"><span>${n}</span> <button class="ctrl-btn highlight" onclick="executeLoad('${n}')">Load</button></div>`).join(''); }
+    function renderLayoutList() { 
+      document.getElementById('layout-list').innerHTML = Object.keys(savedLayouts).map(n => `
+        <div class="list-item-row">
+          <span>${n}</span> 
+          <div>
+            ${n !== "Default" ? `<button class="ctrl-btn warning" style="padding: 4px 10px; margin-right: 5px;" onclick="deleteLayout(event, '${n}')">Delete</button>` : ''}
+            <button class="ctrl-btn highlight" style="padding: 4px 10px;" onclick="executeLoad('${n}')">Load</button>
+          </div>
+        </div>`).join(''); 
+    }
 
-    if(!isOverlay) { initBorderPresets(); initLayouts(); }
+    function deleteLayout(e, name) {
+      e.stopPropagation();
+      if (confirm(`Are you sure you want to delete the layout "${name}"?`)) {
+        delete savedLayouts[name];
+        localStorage.setItem('suiDiscLayoutsV5', JSON.stringify(savedLayouts));
+        if (currentLayoutName === name) {
+          currentLayoutName = "Default";
+          document.getElementById('current-layout-badge').textContent = `Layout: Default`;
+        }
+        renderLayoutList();
+      }
+    }
+
+    function exportMemory() {
+      const exportData = { layouts: savedLayouts, borders: borderPresets, customLists: savedCustomLists };
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportData, null, 2));
+      const dl = document.createElement('a');
+      dl.setAttribute("href", dataStr);
+      dl.setAttribute("download", "sui-discussion-backup.json");
+      document.body.appendChild(dl); dl.click(); dl.remove();
+    }
+
+    function importMemory(event) {
+      const file = event.target.files[0]; if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const importedData = JSON.parse(e.target.result);
+          if (importedData.layouts) {
+            savedLayouts = { ...savedLayouts, ...importedData.layouts };
+            localStorage.setItem('suiDiscLayoutsV5', JSON.stringify(savedLayouts));
+          }
+          if (importedData.borders) {
+            borderPresets = { ...borderPresets, ...importedData.borders };
+            localStorage.setItem('suiBorderPresetsV5', JSON.stringify(borderPresets));
+            updatePresetDropdown();
+          }
+          if (importedData.customLists) {
+            savedCustomLists = { ...savedCustomLists, ...importedData.customLists };
+            localStorage.setItem('suiSavedCustomLists', JSON.stringify(savedCustomLists));
+            updateClpDatalist();
+          }
+          alert("All Discussion Suite layouts, borders, and custom lists imported successfully!");
+          document.getElementById('import-file').value = "";
+          renderLayoutList();
+        } catch (error) { alert("Invalid backup file."); }
+      };
+      reader.readAsText(file);
+    }
+
+    if(!isOverlay) { initBorderPresets(); initCustomListMemory(); initLayouts(); }
   </script>
 </body>
 </html>
