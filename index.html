@@ -22,21 +22,20 @@
       
       --lss-scale: 1; --lss-x: 50%; --lss-y: 20%; --lss-bg: linear-gradient(90deg, #ff0000 0%, #cc0000 100%); --lss-txt: #ffffff;
       
-      --agl-scale: 1; --agl-x: 80%; --agl-y: 50%; --agl-bg: linear-gradient(135deg, #111 0%, #222 100%); --agl-txt: #ffffff;
+      --agl-scale: 1; --agl-x: 20%; --agl-y: 50%; --agl-bg: linear-gradient(135deg, #111 0%, #222 100%); --agl-txt: #ffffff;
       
       /* Custom List Variables */
       --clp-scale: 1; --clp-x: 20%; --clp-y: 50%; --clp-bg: linear-gradient(135deg, #111 0%, #222 100%); --clp-txt: #ffffff;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
-    html { width: 100vw; height: 100vh; overflow: hidden; display: flex; align-items: center; justify-content: center; background-color: transparent !important; }
-    body { width: 100%; max-width: calc(100vh * 16 / 9); height: 100%; max-height: calc(100vw * 9 / 16); position: relative; background: transparent !important; margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; overflow: hidden; }
+    html, body { background-color: transparent !important; background-image: none !important; font-family: 'Montserrat', sans-serif; overflow: hidden; width: 100vw; height: 100vh; position: relative; }
     img[src=""], img:not([src]) { display: none !important; }
     .font-dropdown, .font-select { background: #222; color: #ccc; border: 1px solid #555; border-radius: 4px; padding: 2px 4px; width: 90px; font-family: 'Montserrat', sans-serif; cursor: pointer; outline: none; font-size: 11px; font-weight: bold; }
 
     /* BORDERS */
     .cam-frame { position: absolute; display: none; aspect-ratio: 16/9; pointer-events: none; border: var(--br-w) solid; border-image: var(--br-style) 1; opacity: var(--br-op); z-index: 1; box-shadow: inset 0 0 20px rgba(0,0,0,0.5), 0 0 20px rgba(0,0,0,0.5); }
-    #global-frame { left: 0; top: 0; width: 100%; height: 100%; z-index: 99; border-width: var(--br-w); }
+    #global-frame { left: 0; top: 0; width: 100vw; height: 100vh; z-index: 99; border-width: var(--br-w); }
 
     /* WIDGETS */
     .sub-count-wrapper { position: absolute; left: 20px; top: 20px; height: 100px; width: 380px; background: rgba(12, 14, 18, 0.95); border-radius: 8px; border: 2px solid rgba(255, 255, 255, 0.18); box-shadow: 0 8px 24px rgba(0,0,0,0.85); overflow: hidden; z-index: 5; }
@@ -47,11 +46,11 @@
     .target-label { color: #e2e8f0; font-family: var(--ff-tgt-lbl); font-size: var(--f-tgt-label); letter-spacing: 1.5px; text-transform: uppercase; font-weight: 800; }
     .target-value { color: #ffd700; font-family: var(--ff-tgt-val); font-size: var(--f-tgt-val); line-height: 0.8; font-weight: 700; text-shadow: 1px 1px 3px rgba(0,0,0,0.9); }
 
-    .ticker-wrapper { position: absolute; bottom: 0; left: 0; width: 100%; height: var(--tk-h); display: flex; align-items: center; overflow: hidden; z-index: 50; box-shadow: 0 -4px 12px rgba(0,0,0,0.6); transition: height 0.3s; }
+    .ticker-wrapper { position: absolute; bottom: 0; left: 0; width: 100vw; height: var(--tk-h); display: flex; align-items: center; overflow: hidden; z-index: 50; box-shadow: 0 -4px 12px rgba(0,0,0,0.6); transition: height 0.3s; }
     .ticker-bg { position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: var(--tk-op); z-index: 1; transition: opacity 0.2s, background 0.3s; }
     .ticker-content { position: relative; z-index: 2; width: 100%; }
     .ticker-text { color: var(--tk-txt-c); font-family: var(--ff-tk); font-size: var(--tk-f); font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; text-shadow: 1px 1px 3px rgba(0,0,0,0.9); white-space: nowrap; }
-    .ticker-text.scrolling { display: inline-block; padding-left: 100%; animation: ticker-scroll 25s linear infinite; }
+    .ticker-text.scrolling { display: inline-block; padding-left: 100vw; animation: ticker-scroll 25s linear infinite; }
     .ticker-text.static { display: block; width: 100%; text-align: center; padding-left: 0; animation: none; }
     @keyframes ticker-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
     @keyframes pulse { from { opacity: 0.3; } to { opacity: 1; } }
@@ -550,7 +549,7 @@
     function togglePanel(id) { const c = document.getElementById(id); const i = document.getElementById(id + '-icon'); if (c.classList.contains('active')) { c.classList.remove('active'); i.textContent = '▼'; } else { c.classList.add('active'); i.textContent = '▲'; } }
     function togglePanelBody() { const b = document.getElementById('controls-body'); const btn = document.getElementById('btn-toggle-panel'); if (b.style.display === 'none') { b.style.display = 'flex'; btn.textContent = 'Minimize Panel'; } else { b.style.display = 'none'; btn.textContent = 'Expand Panel'; } }
 
-    // Unified Drag Logic (Percentage % with Right Anchor & Aspect Box Support)
+    // Unified Drag Logic (Percentage % with Right Anchor support)
     let isDraggingEl = null, isDraggingPanel = false;
     let sX, sY, iL, iT;
 
@@ -577,22 +576,16 @@
         document.getElementById('controls').style.left = (iL + e.clientX - sX) + 'px'; document.getElementById('controls').style.top = (iT + e.clientY - sY) + 'px';
       }
       if(isDraggingEl) {
-        const rect = document.body.getBoundingClientRect();
-        
-        // Lock calculations strictly inside the 16:9 canvas
-        let cx = Math.max(rect.left, Math.min(e.clientX, rect.right));
-        let cy = Math.max(rect.top, Math.min(e.clientY, rect.bottom));
-
-        const py = ((cy - rect.top) / rect.height) * 100;
+        const py = (e.clientY / window.innerHeight) * 100;
         isDraggingEl.el.style.top = py + '%';
 
         if (isDraggingEl.el.dataset.originX === 'right') {
-          const pxRight = ((rect.right - cx) / rect.width) * 100;
+          const pxRight = ((window.innerWidth - e.clientX) / window.innerWidth) * 100;
           isDraggingEl.el.style.left = 'auto';
           isDraggingEl.el.style.right = pxRight + '%';
           if(isDraggingEl.updateCallback) isDraggingEl.updateCallback(pxRight, py);
         } else {
-          const px = ((cx - rect.left) / rect.width) * 100;
+          const px = (e.clientX / window.innerWidth) * 100;
           isDraggingEl.el.style.right = 'auto';
           isDraggingEl.el.style.left = px + '%';
           if(isDraggingEl.updateCallback) isDraggingEl.updateCallback(px, py);
@@ -834,10 +827,14 @@
       r.style.setProperty('--ag-b3-c', state.agB3C); r.style.setProperty('--ag-b3-bg', getGrad(state.agB3Style, state.agB3Bg1, state.agB3Bg2));
       
       r.style.setProperty('--agl-scale', state.aglScale); r.style.setProperty('--agl-txt', state.aglTxtC); r.style.setProperty('--agl-bg', getGrad(state.aglStyle, state.aglC1, state.aglC2));
+      
+      // Inline memory lock for Agenda (Right Anchor)
       const aglEl = document.getElementById('agl-wrapper');
       if (aglEl) { aglEl.style.left = 'auto'; aglEl.style.right = state.aglX+'%'; aglEl.style.top = state.aglY+'%'; }
       
       r.style.setProperty('--clp-scale', state.clpScale); r.style.setProperty('--clp-txt', state.clpTxtC); r.style.setProperty('--clp-bg', getGrad(state.clpStyle, state.clpC1, state.clpC2));
+      
+      // Inline memory lock for Custom List (Left Anchor)
       const clpEl = document.getElementById('clp-wrapper');
       if (clpEl) { clpEl.style.right = 'auto'; clpEl.style.left = state.clpX+'%'; clpEl.style.top = state.clpY+'%'; }
       
@@ -856,6 +853,8 @@
       });
 
       r.style.setProperty('--lss-scale', state.lssScale); r.style.setProperty('--lss-bg', getGrad(state.lssStyle, state.lssC1, state.lssC2)); r.style.setProperty('--lss-txt', state.lssTxtC);
+      
+      // Inline memory lock for LSS (Left Anchor)
       const lssEl = document.getElementById('lss-widget');
       if (lssEl) { lssEl.style.right = 'auto'; lssEl.style.left = state.lssX+'%'; lssEl.style.top = state.lssY+'%'; }
       
