@@ -23,9 +23,11 @@
       --lss-scale: 1; --lss-x: 50%; --lss-y: 20%; --lss-bg: linear-gradient(90deg, #ff0000 0%, #cc0000 100%); --lss-txt: #ffffff;
       
       --agl-scale: 1; --agl-x: 20%; --agl-y: 50%; --agl-bg: linear-gradient(135deg, #111 0%, #222 100%); --agl-txt: #ffffff;
+      --agl-f-hd: 20px; --agl-f-item: 16px;
       
       /* Custom List Variables */
       --clp-scale: 1; --clp-x: 20%; --clp-y: 50%; --clp-bg: linear-gradient(135deg, #111 0%, #222 100%); --clp-txt: #ffffff;
+      --clp-f-hd: 20px; --clp-f-item: 16px;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
@@ -77,9 +79,9 @@
     /* VERTICAL AGENDA LIST PANEL (WITH AUTO SORTING & INDICATORS) */
     .agenda-list-wrapper { position: absolute; right: var(--agl-x); top: var(--agl-y); transform: translate(50%, -50%) scale(var(--agl-scale)); z-index: 15; display: flex; flex-direction: column; border-radius: 8px; border: 2px solid rgba(255, 255, 255, 0.25); box-shadow: 0 8px 24px rgba(0,0,0,0.85); overflow: hidden; min-width: 320px; cursor: grab; background: var(--agl-bg); }
     .agenda-list-wrapper:active { cursor: grabbing; }
-    .agl-header { background: rgba(0,0,0,0.6); color: var(--agl-txt); padding: 12px; font-family: var(--ff-ag); font-size: 20px; font-weight: 900; text-align: center; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 2px solid rgba(255,255,255,0.2); }
+    .agl-header { background: rgba(0,0,0,0.6); color: var(--agl-txt); padding: 12px; font-family: var(--ff-ag); font-size: var(--agl-f-hd); font-weight: 900; text-align: center; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 2px solid rgba(255,255,255,0.2); }
     .agl-body { display: flex; flex-direction: column; padding: 12px; gap: 8px; }
-    .agl-item { color: var(--agl-txt); font-family: var(--ff-ag); font-size: 16px; font-weight: 700; text-transform: uppercase; padding: 8px 12px; border-left: 4px solid transparent; background: rgba(0,0,0,0.2); transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); border-radius: 0 4px 4px 0; display: flex; align-items: center; gap: 8px; }
+    .agl-item { color: var(--agl-txt); font-family: var(--ff-ag); font-size: var(--agl-f-item); font-weight: 700; text-transform: uppercase; padding: 8px 12px; border-left: 4px solid transparent; background: rgba(0,0,0,0.2); transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); border-radius: 0 4px 4px 0; display: flex; align-items: center; gap: 8px; }
     .agl-item.status-now { border-left-color: #ffd700; background: rgba(255, 215, 0, 0.2); color: #ffd700; transform: scale(1.02); box-shadow: 0 4px 10px rgba(0,0,0,0.3); text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 2px 2px 4px rgba(0,0,0,0.8); }
     .agl-item.status-next { border-left-color: #3b82f6; background: rgba(59, 130, 246, 0.2); color: #60a5fa; text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 2px 2px 4px rgba(0,0,0,0.8); }
     .agl-item.status-completed { border-left-color: #10b981; opacity: 0.55; }
@@ -90,15 +92,15 @@
     /* CUSTOM VERTICAL LIST PANEL */
     .custom-list-wrapper { position: absolute; left: var(--clp-x); top: var(--clp-y); transform: translate(-50%, -50%) scale(var(--clp-scale)); z-index: 16; display: flex; flex-direction: column; border-radius: 8px; border: 2px solid rgba(255, 255, 255, 0.25); box-shadow: 0 8px 24px rgba(0,0,0,0.85); overflow: hidden; min-width: 300px; cursor: grab; background: var(--clp-bg); }
     .custom-list-wrapper:active { cursor: grabbing; }
-    .clp-header { background: rgba(0,0,0,0.6); color: var(--clp-txt); padding: 12px; font-family: var(--ff-ag); font-size: 20px; font-weight: 900; text-align: center; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 2px solid rgba(255,255,255,0.2); }
+    .clp-header { background: rgba(0,0,0,0.6); color: var(--clp-txt); padding: 12px; font-family: var(--ff-ag); font-size: var(--clp-f-hd); font-weight: 900; text-align: center; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 2px solid rgba(255,255,255,0.2); }
     .clp-body { display: flex; flex-direction: column; padding: 12px; gap: 8px; }
-    .clp-item { color: var(--clp-txt); font-family: var(--ff-ag); font-size: 16px; font-weight: 700; text-transform: uppercase; padding: 8px 12px; border-left: 4px solid transparent; background: rgba(0,0,0,0.2); transition: all 0.2s; border-radius: 0 4px 4px 0; }
+    .clp-item { color: var(--clp-txt); font-family: var(--ff-ag); font-size: var(--clp-f-item); font-weight: 700; text-transform: uppercase; padding: 8px 12px; border-left: 4px solid transparent; background: rgba(0,0,0,0.2); transition: all 0.2s; border-radius: 0 4px 4px 0; }
     .clp-item.highlighted { transform: scale(1.02); box-shadow: 0 4px 10px rgba(0,0,0,0.3); text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 2px 2px 4px rgba(0,0,0,0.8); }
 
     /* LSS WIDGET */
-    .lss-wrapper { position: absolute; left: var(--lss-x); top: var(--lss-y); transform: translate(-50%, -50%) scale(var(--lss-scale)); background: var(--lss-bg); border-radius: 30px; padding: 12px 30px; color: var(--lss-txt); font-family: 'Montserrat', sans-serif; font-size: 20px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 2px solid rgba(255,255,255,0.3); display: flex; gap: 15px; align-items: center; z-index: 90; cursor: grab; white-space: nowrap; width: max-content; flex-wrap: nowrap; }
+    .lss-wrapper { position: absolute; left: var(--lss-x); top: var(--lss-y); transform: translate(-50%, -50%) scale(var(--lss-scale)); background: var(--lss-bg); border-radius: 30px; padding: 12px 30px; color: var(--lss-txt); font-family: 'Montserrat', sans-serif; font-size: 20px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 2px solid rgba(255,255,255,0.3); display: flex; gap: 15px; align-items: center; z-index: 90; cursor: grab; }
     .lss-wrapper:active { cursor: grabbing; }
-    .lss-icon { font-size: 24px; }
+    .lss-icon { font-size: 24px; font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif; }
     .lss-animated { animation: lss-pulse 2s infinite cubic-bezier(0.4, 0, 0.6, 1); }
     @keyframes lss-pulse { 0%, 100% { transform: translate(-50%, -50%) scale(var(--lss-scale)); } 50% { transform: translate(-50%, -50%) scale(calc(var(--lss-scale) * 1.05)); } }
 
@@ -347,6 +349,8 @@
         <div class="sub-panel slider-group" style="margin-bottom:0;">
           <span class="section-title">Panel Style (Draggable in overlay)</span>
           <div class="slider-container"><span>Panel Scale</span><input type="range" id="agl-scale" min="0.5" max="2" step="0.05" oninput="applyVisualsLocally()"></div>
+          <div class="slider-container"><span>Head Size</span><input type="range" id="agl-f-hd" min="12" max="50" oninput="applyVisualsLocally()"></div>
+          <div class="slider-container"><span>Item Size</span><input type="range" id="agl-f-item" min="10" max="40" oninput="applyVisualsLocally()"></div>
           <div class="slider-container"><span>Text Color</span><input type="color" id="agl-txt-c" oninput="applyVisualsLocally()"></div>
           <div class="slider-container"><span>BG Style</span><select id="agl-style" class="font-select" onchange="applyVisualsLocally()"><option value="solid">Solid</option><option value="split">Split</option><option value="gradient">Grad</option></select></div>
           <div class="slider-container"><span>BG C1</span><input type="color" id="agl-c1" oninput="applyVisualsLocally()"></div>
@@ -380,6 +384,8 @@
         <div class="sub-panel slider-group" style="margin-bottom:0;">
           <span class="section-title">Panel Style (Draggable in overlay)</span>
           <div class="slider-container"><span>Panel Scale</span><input type="range" id="clp-scale" min="0.5" max="2" step="0.05" oninput="applyVisualsLocally()"></div>
+          <div class="slider-container"><span>Head Size</span><input type="range" id="clp-f-hd" min="12" max="50" oninput="applyVisualsLocally()"></div>
+          <div class="slider-container"><span>Item Size</span><input type="range" id="clp-f-item" min="10" max="40" oninput="applyVisualsLocally()"></div>
           <div class="slider-container"><span>Text Color</span><input type="color" id="clp-txt-c" oninput="applyVisualsLocally()"></div>
           <div class="slider-container"><span>BG Style</span><select id="clp-style" class="font-select" onchange="applyVisualsLocally()"><option value="solid">Solid</option><option value="split">Split</option><option value="gradient">Grad</option></select></div>
           <div class="slider-container"><span>BG C1</span><input type="color" id="clp-c1" oninput="applyVisualsLocally()"></div>
@@ -607,11 +613,11 @@
       agR3Txt: "East Bengal Tactical Breakdown", agR3F: 16, agR3C: "#aaaaaa", agR3Style: "solid", agR3Bg1: "#111111", agR3Bg2: "#111111", agB3C: "#ffffff", agB3Style: "solid", agB3Bg1: "#3b82f6", agB3Bg2: "#3b82f6",
       
       // Agenda Vertical List (Linked) - Right Anchored
-      aglVis: false, aglTitle: "Today's Agenda", aglScale: 1, aglX: 20, aglY: 50, aglTxtC: "#ffffff", aglStyle: "gradient", aglC1: "#111111", aglC2: "#222222",
+      aglVis: false, aglTitle: "Today's Agenda", aglScale: 1, aglFHd: 20, aglFItem: 16, aglX: 20, aglY: 50, aglTxtC: "#ffffff", aglStyle: "gradient", aglC1: "#111111", aglC2: "#222222",
       agendaItems: [ {id: 1, text: "Pre-Match Build Up", status: "now"}, {id: 2, text: "East Bengal Tactical Breakdown", status: "next"} ],
 
       // Custom Vertical List (Free text) - Left Anchored
-      clpVis: false, clpTitle: "Key Talking Points", clpScale: 1, clpX: 20, clpY: 50, clpTxtC: "#ffffff", clpStyle: "gradient", clpC1: "#111111", clpC2: "#222222", clpGlobalHlC: "#ffd700",
+      clpVis: false, clpTitle: "Key Talking Points", clpScale: 1, clpFHd: 20, clpFItem: 16, clpX: 20, clpY: 50, clpTxtC: "#ffffff", clpStyle: "gradient", clpC1: "#111111", clpC2: "#222222", clpGlobalHlC: "#ffd700",
       clpItems: [ {id: 1, text: "Strong Attack", hl: false, hlC: "#ffd700"} ],
 
       // Nameplates - Left Anchored
@@ -788,8 +794,10 @@
       state.agB3C = document.getElementById('ag-b3-c').value; state.agB3Style = document.getElementById('ag-b3-style').value; state.agB3Bg1 = document.getElementById('ag-b3-bg1').value; state.agB3Bg2 = document.getElementById('ag-b3-bg2').value;
 
       state.aglScale = document.getElementById('agl-scale').value; state.aglTxtC = document.getElementById('agl-txt-c').value; state.aglStyle = document.getElementById('agl-style').value; state.aglC1 = document.getElementById('agl-c1').value; state.aglC2 = document.getElementById('agl-c2').value;
+      state.aglFHd = document.getElementById('agl-f-hd').value; state.aglFItem = document.getElementById('agl-f-item').value;
       
       state.clpScale = document.getElementById('clp-scale').value; state.clpTxtC = document.getElementById('clp-txt-c').value; state.clpStyle = document.getElementById('clp-style').value; state.clpC1 = document.getElementById('clp-c1').value; state.clpC2 = document.getElementById('clp-c2').value;
+      state.clpFHd = document.getElementById('clp-f-hd').value; state.clpFItem = document.getElementById('clp-f-item').value;
 
       state.ffL3 = document.getElementById('ff-l3').value; state.l3FName = document.getElementById('l3-f-name').value; state.l3FTitle = document.getElementById('l3-f-title').value;
 
@@ -827,12 +835,14 @@
       r.style.setProperty('--ag-b3-c', state.agB3C); r.style.setProperty('--ag-b3-bg', getGrad(state.agB3Style, state.agB3Bg1, state.agB3Bg2));
       
       r.style.setProperty('--agl-scale', state.aglScale); r.style.setProperty('--agl-txt', state.aglTxtC); r.style.setProperty('--agl-bg', getGrad(state.aglStyle, state.aglC1, state.aglC2));
+      r.style.setProperty('--agl-f-hd', state.aglFHd+'px'); r.style.setProperty('--agl-f-item', state.aglFItem+'px');
       
       // Inline memory lock for Agenda (Right Anchor)
       const aglEl = document.getElementById('agl-wrapper');
       if (aglEl) { aglEl.style.left = 'auto'; aglEl.style.right = state.aglX+'%'; aglEl.style.top = state.aglY+'%'; }
       
       r.style.setProperty('--clp-scale', state.clpScale); r.style.setProperty('--clp-txt', state.clpTxtC); r.style.setProperty('--clp-bg', getGrad(state.clpStyle, state.clpC1, state.clpC2));
+      r.style.setProperty('--clp-f-hd', state.clpFHd+'px'); r.style.setProperty('--clp-f-item', state.clpFItem+'px');
       
       // Inline memory lock for Custom List (Left Anchor)
       const clpEl = document.getElementById('clp-wrapper');
@@ -881,9 +891,11 @@
 
         document.getElementById('agl-vis').checked = state.aglVis; document.getElementById('agl-title').value = state.aglTitle;
         document.getElementById('agl-scale').value = state.aglScale; document.getElementById('agl-txt-c').value = state.aglTxtC; document.getElementById('agl-style').value = state.aglStyle; document.getElementById('agl-c1').value = state.aglC1; document.getElementById('agl-c2').value = state.aglC2;
+        document.getElementById('agl-f-hd').value = state.aglFHd || 20; document.getElementById('agl-f-item').value = state.aglFItem || 16;
         
         document.getElementById('clp-vis').checked = state.clpVis; document.getElementById('clp-title').value = state.clpTitle;
         document.getElementById('clp-scale').value = state.clpScale; document.getElementById('clp-txt-c').value = state.clpTxtC; document.getElementById('clp-style').value = state.clpStyle; document.getElementById('clp-c1').value = state.clpC1; document.getElementById('clp-c2').value = state.clpC2;
+        document.getElementById('clp-f-hd').value = state.clpFHd || 20; document.getElementById('clp-f-item').value = state.clpFItem || 16;
 
         document.getElementById('ff-l3').value = state.ffL3; document.getElementById('l3-f-name').value = state.l3FName; document.getElementById('l3-f-title').value = state.l3FTitle;
         
@@ -1147,8 +1159,8 @@
         'agVis', 'agScale', 'ffAg', 'agR1F', 'agR1C', 'agR1Style', 'agR1Bg1', 'agR1Bg2',
         'agR2F', 'agR2C', 'agR2Style', 'agR2Bg1', 'agR2Bg2', 'agB2C', 'agB2Style', 'agB2Bg1', 'agB2Bg2',
         'agR3F', 'agR3C', 'agR3Style', 'agR3Bg1', 'agR3Bg2', 'agB3C', 'agB3Style', 'agB3Bg1', 'agB3Bg2',
-        'aglVis', 'aglScale', 'aglTxtC', 'aglStyle', 'aglC1', 'aglC2', 'aglX', 'aglY',
-        'clpVis', 'clpScale', 'clpTxtC', 'clpStyle', 'clpC1', 'clpC2', 'clpX', 'clpY',
+        'aglVis', 'aglScale', 'aglFHd', 'aglFItem', 'aglTxtC', 'aglStyle', 'aglC1', 'aglC2', 'aglX', 'aglY',
+        'clpVis', 'clpScale', 'clpFHd', 'clpFItem', 'clpTxtC', 'clpStyle', 'clpC1', 'clpC2', 'clpX', 'clpY',
         'ffL3', 'l3FName', 'l3FTitle', 
         'lssVis', 'lssScale', 'lssTxtC', 'lssStyle', 'lssC1', 'lssC2', 'lssX', 'lssY',
         'tkVis', 'tkScroll', 'ffTk', 'tkF', 'tkTxtC', 'tkH', 'tkOp', 'tkStyle', 'tkC1', 'tkC2',
