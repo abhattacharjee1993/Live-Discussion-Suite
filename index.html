@@ -921,19 +921,19 @@
         let styleStr = i.hl ? `border-left-color: ${i.hlC}; background: ${i.hlC}33; color: ${i.hlC};` : '';
         return `<div class="clp-item ${i.hl ? 'highlighted' : ''}" style="${styleStr}">${i.text}</div>`;
       }).join('');
-      attachDraggable(document.getElementById('clp-wrapper'), (x, y) => { state.clpX = x; state.clpY = y; });
+      attachDraggable(document.getElementById('clp-wrapper'), (x, y) => { state.clpX = x; state.clpY = y; }, 'left');
 
       document.getElementById('overlay-nameplates').innerHTML = state.nameplates.map(np => 
         np.vis ? `<div class="nameplate-wrapper" id="np-overlay-${np.id}" style="right:auto; left:${np.x}%; top:${np.y}%;"><div class="np-top" style="color:${np.txtNameC}; background:${getGrad(np.style, np.c1, np.c2)};">${np.name}</div><div class="np-bottom" style="color:${np.txtTitleC}; background:${getGrad(np.titleStyle, np.titleBg1, np.titleBg2)};">${np.title}</div></div>` : ''
       ).join('');
       state.nameplates.forEach(np => {
         const el = document.getElementById(`np-overlay-${np.id}`);
-        if(el) attachDraggable(el, (x, y) => { np.x = x; np.y = y; });
+        if(el) attachDraggable(el, (x, y) => { np.x = x; np.y = y; }, 'left');
       });
 
       document.getElementById('lss-widget').style.display = state.lssVis ? 'flex' : 'none';
       document.getElementById('lss-widget').className = state.lssAnim ? 'lss-wrapper lss-animated' : 'lss-wrapper';
-      attachDraggable(document.getElementById('lss-widget'), (x, y) => { state.lssX = x; state.lssY = y; });
+      attachDraggable(document.getElementById('lss-widget'), (x, y) => { state.lssX = x; state.lssY = y; }, 'left');
 
       document.getElementById('ticker-wrapper').style.display = state.tkVis ? 'flex' : 'none';
       document.getElementById('ticker-text').textContent = state.tkTxt; document.getElementById('ticker-text').className = state.tkScroll ? 'ticker-text scrolling' : 'ticker-text static';
