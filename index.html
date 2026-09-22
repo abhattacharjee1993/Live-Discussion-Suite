@@ -4,6 +4,10 @@
   <meta charset="UTF-8">
   <title>Sports Unplugged India | Live Discussion Suite V5.1</title>
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Fira+Sans:wght@400;700&family=Inter:wght@400;700;800&family=Lato:wght@400;700;900&family=Merriweather:wght@400;700;900&family=Montserrat:wght@400;600;700;800&family=Nunito:wght@400;700;800&family=Open+Sans:wght@400;700;800&family=Oswald:wght@400;700&family=PT+Sans:wght@400;700&family=Playfair+Display:wght@400;700;800&family=Poppins:wght@400;700;800&family=Raleway:wght@400;700;800&family=Roboto:wght@400;700;900&family=Rubik:wght@400;700;800&family=Teko:wght@400;600;700&family=Ubuntu:wght@400;700&family=Work+Sans:wght@400;700;800&display=swap" rel="stylesheet">
+  
+  <!-- NEW: Explicitly import Noto Color Emoji so cloud rendering servers can display emojis -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap" rel="stylesheet">
+  
   <script src="https://cdn.pubnub.com/sdk/javascript/pubnub.7.2.2.min.js"></script>
   <style>
     :root {
@@ -100,7 +104,10 @@
     /* LSS WIDGET */
     .lss-wrapper { position: absolute; left: var(--lss-x); top: var(--lss-y); transform: translate(-50%, -50%) scale(var(--lss-scale)); background: var(--lss-bg); border-radius: 30px; padding: 12px 30px; color: var(--lss-txt); font-family: 'Montserrat', sans-serif; font-size: 20px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 2px solid rgba(255,255,255,0.3); display: flex; gap: 15px; align-items: center; z-index: 90; cursor: grab; }
     .lss-wrapper:active { cursor: grabbing; }
-    .lss-icon { font-size: 24px; font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif; }
+    
+    /* NEW: Explicitly mapped font-family for web rendering */
+    .lss-icon { font-size: 24px; font-family: "Noto Color Emoji", sans-serif; }
+    
     .lss-animated { animation: lss-pulse 2s infinite cubic-bezier(0.4, 0, 0.6, 1); }
     @keyframes lss-pulse { 0%, 100% { transform: translate(-50%, -50%) scale(var(--lss-scale)); } 50% { transform: translate(-50%, -50%) scale(calc(var(--lss-scale) * 1.05)); } }
 
