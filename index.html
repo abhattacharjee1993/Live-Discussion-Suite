@@ -8,7 +8,7 @@
   <style>
     :root {
       --target-scale: 1; --ff-tgt-lbl: 'Montserrat', sans-serif; --f-tgt-label: 13px; --ff-tgt-val: 'Teko', sans-serif; --f-tgt-val: 30px;
-      --tk-h: 40px; --ff-tk: 'Montserrat', sans-serif; --tk-f: 22px; --tk-op: 0.9; --tk-txt-c: #ffffff;
+      --tk-h: 40px; --ff-tk: 'Montserrat', sans-serif; --tk-f: 22px; --tk-op: 0.9; --tk-txt-c: #ffffff; --tk-spd: 25s;
       
       --ag-scale: 1; --ff-ag: 'Montserrat', sans-serif;
       --ag-r1-f: 24px; --ag-r1-c: #ffffff; --ag-r1-bg: #111;
@@ -52,7 +52,7 @@
     .ticker-bg { position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: var(--tk-op); z-index: 1; transition: opacity 0.2s, background 0.3s; }
     .ticker-content { position: relative; z-index: 2; width: 100%; }
     .ticker-text { color: var(--tk-txt-c); font-family: var(--ff-tk); font-size: var(--tk-f); font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; text-shadow: 1px 1px 3px rgba(0,0,0,0.9); white-space: nowrap; }
-    .ticker-text.scrolling { display: inline-block; padding-left: 100vw; animation: ticker-scroll 25s linear infinite; }
+    .ticker-text.scrolling { display: inline-block; padding-left: 100vw; animation: ticker-scroll var(--tk-spd, 25s) linear infinite; }
     .ticker-text.static { display: block; width: 100%; text-align: center; padding-left: 0; animation: none; }
     @keyframes ticker-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
     @keyframes pulse { from { opacity: 0.3; } to { opacity: 1; } }
@@ -441,6 +441,7 @@
           <div class="slider-group">
             <div class="slider-container"><span>Font Fam</span><select id="ff-tk" class="font-select" onchange="applyVisualsLocally()"><script>document.write(fontOptions);</script></select></div>
             <div class="slider-container"><span>Font Size</span><input type="range" id="tk-f" min="12" max="60" oninput="applyVisualsLocally()"></div>
+            <div class="slider-container"><span>Speed</span><input type="range" id="tk-spd" min="5" max="60" step="1" title="Scroll duration in seconds (lower is faster)" oninput="applyVisualsLocally()"></div>
             <div class="slider-container"><span>Text C</span><input type="color" id="tk-txt-c" oninput="applyVisualsLocally()"></div>
             <div class="slider-container"><span>Height</span><input type="range" id="tk-h" min="20" max="100" oninput="applyVisualsLocally()"></div>
             <div class="slider-container"><span>Opacity</span><input type="range" id="tk-op" min="0.2" max="1" step="0.05" oninput="applyVisualsLocally()"></div>
@@ -541,13 +542,11 @@
 
     // Capture state PRE-MUTATION for Undo/Redo support on inputs
     if(!isOverlay) {
-      // For Text Inputs and Selects: Save history right before user starts changing them
       document.getElementById('controls').addEventListener('focusin', (e) => {
         if(['INPUT', 'SELECT'].includes(e.target.tagName)) {
           saveHistory();
         }
       });
-      // For Checkboxes, Sliders, and Color Pickers: Save history on click if they aren't already focused
       document.getElementById('controls').addEventListener('mousedown', (e) => {
         if(['checkbox', 'range', 'color'].includes(e.target.type) && document.activeElement !== e.target) {
           saveHistory();
@@ -581,7 +580,7 @@
       el.dataset.originX = originX;
       el.addEventListener('mousedown', (e) => {
         if(isOverlay || e.button !== 0) return;
-        saveHistory(); // Captured BEFORE dragging starts for Undo support
+        saveHistory();
         isDraggingEl = { el, updateCallback };
         document.getElementById('drag-hint').style.display = 'block';
       });
@@ -618,7 +617,7 @@
       }
     });
 
-    // MASTER STATE (Using Percentage %)
+    // MASTER STATE
     let state = {
       // Agenda Tracker
       agVis: true, agScale: 1, ffAg: "'Montserrat', sans-serif",
@@ -642,7 +641,7 @@
       lssVis: true, lssAnim: true, lssScale: 1, lssX: 50, lssY: 20, lssStyle: "gradient", lssC1: "#ff0000", lssC2: "#cc0000", lssTxtC: "#ffffff",
       
       // Ticker
-      tkVis: true, tkScroll: true, tkTxt: "Welcome to Sports Unplugged India! Please Like and Subscribe.", ffTk: "'Montserrat', sans-serif", tkF: 22, tkTxtC: "#ffffff", tkH: 40, tkOp: 0.9, tkStyle: "gradient", tkC1: "#1a202c", tkC2: "#2d3748",
+      tkVis: true, tkScroll: true, tkTxt: "Welcome to Sports Unplugged India! Please Like and Subscribe.", tkSpd: 25, ffTk: "'Montserrat', sans-serif", tkF: 22, tkTxtC: "#ffffff", tkH: 40, tkOp: 0.9, tkStyle: "gradient", tkC1: "#1a202c", tkC2: "#2d3748",
       
       // Borders
       brVis: false, brW: 8, brOp: 1, brStyle: "split", brC1: "#d31122", brC2: "#f6b200",
@@ -721,7 +720,7 @@
       const item = state.agendaItems.find(a => a.id === id);
       
       if(item.status === status) {
-        item.status = 'none'; // Toggle off if clicked twice
+        item.status = 'none';
       } else {
         if(status === 'now') {
           state.agendaItems.forEach(a => { if(a.status==='now') a.status='none'; }); 
@@ -734,7 +733,6 @@
         }
       }
       
-      // Auto-Sort Engine
       const order = { 'now': 1, 'next': 2, 'none': 3, 'completed': 4 };
       state.agendaItems.sort((a, b) => order[a.status] - order[b.status]);
       
@@ -830,7 +828,7 @@
       });
 
       state.lssScale = document.getElementById('lss-scale').value; state.lssTxtC = document.getElementById('lss-txt-c').value; state.lssStyle = document.getElementById('lss-style').value; state.lssC1 = document.getElementById('lss-c1').value; state.lssC2 = document.getElementById('lss-c2').value;
-      state.ffTk = document.getElementById('ff-tk').value; state.tkF = document.getElementById('tk-f').value; state.tkTxtC = document.getElementById('tk-txt-c').value; state.tkH = document.getElementById('tk-h').value; state.tkOp = document.getElementById('tk-op').value; state.tkStyle = document.getElementById('tk-style').value; state.tkC1 = document.getElementById('tk-c1').value; state.tkC2 = document.getElementById('tk-c2').value;
+      state.ffTk = document.getElementById('ff-tk').value; state.tkF = document.getElementById('tk-f').value; state.tkSpd = document.getElementById('tk-spd').value; state.tkTxtC = document.getElementById('tk-txt-c').value; state.tkH = document.getElementById('tk-h').value; state.tkOp = document.getElementById('tk-op').value; state.tkStyle = document.getElementById('tk-style').value; state.tkC1 = document.getElementById('tk-c1').value; state.tkC2 = document.getElementById('tk-c2').value;
       state.brW = document.getElementById('br-w').value; state.brOp = document.getElementById('br-op').value; state.brStyle = document.getElementById('br-style').value; state.brC1 = document.getElementById('br-c1').value; state.brC2 = document.getElementById('br-c2').value;
       state.tgtScale = document.getElementById('tgt-scale').value; state.ffTgtLbl = document.getElementById('ff-tgt-lbl').value; state.fTgtLbl = document.getElementById('tgt-f-lbl').value; state.ffTgtVal = document.getElementById('ff-tgt-val').value; state.fTgtVal = document.getElementById('tgt-f-val').value; state.tgtStyle = document.getElementById('tgt-style').value; state.tgtC1 = document.getElementById('tgt-c1').value; state.tgtC2 = document.getElementById('tgt-c2').value;
 
@@ -851,14 +849,12 @@
       r.style.setProperty('--agl-scale', state.aglScale); r.style.setProperty('--agl-txt', state.aglTxtC); r.style.setProperty('--agl-bg', getGrad(state.aglStyle, state.aglC1, state.aglC2));
       r.style.setProperty('--agl-f-hd', state.aglFHd+'px'); r.style.setProperty('--agl-f-item', state.aglFItem+'px');
       
-      // Inline memory lock for Agenda (Right Anchor)
       const aglEl = document.getElementById('agl-wrapper');
       if (aglEl) { aglEl.style.left = 'auto'; aglEl.style.right = state.aglX+'%'; aglEl.style.top = state.aglY+'%'; }
       
       r.style.setProperty('--clp-scale', state.clpScale); r.style.setProperty('--clp-txt', state.clpTxtC); r.style.setProperty('--clp-bg', getGrad(state.clpStyle, state.clpC1, state.clpC2));
       r.style.setProperty('--clp-f-hd', state.clpFHd+'px'); r.style.setProperty('--clp-f-item', state.clpFItem+'px');
       
-      // Inline memory lock for Custom List (Left Anchor)
       const clpEl = document.getElementById('clp-wrapper');
       if (clpEl) { clpEl.style.right = 'auto'; clpEl.style.left = state.clpX+'%'; clpEl.style.top = state.clpY+'%'; }
       
@@ -878,11 +874,10 @@
 
       r.style.setProperty('--lss-scale', state.lssScale); r.style.setProperty('--lss-bg', getGrad(state.lssStyle, state.lssC1, state.lssC2)); r.style.setProperty('--lss-txt', state.lssTxtC);
       
-      // Inline memory lock for LSS (Left Anchor)
       const lssEl = document.getElementById('lss-widget');
       if (lssEl) { lssEl.style.right = 'auto'; lssEl.style.left = state.lssX+'%'; lssEl.style.top = state.lssY+'%'; }
       
-      r.style.setProperty('--tk-h', state.tkH+'px'); r.style.setProperty('--ff-tk', state.ffTk); r.style.setProperty('--tk-f', state.tkF+'px'); r.style.setProperty('--tk-txt-c', state.tkTxtC); r.style.setProperty('--tk-op', state.tkOp);
+      r.style.setProperty('--tk-h', state.tkH+'px'); r.style.setProperty('--ff-tk', state.ffTk); r.style.setProperty('--tk-f', state.tkF+'px'); r.style.setProperty('--tk-spd', (state.tkSpd || 25)+'s'); r.style.setProperty('--tk-txt-c', state.tkTxtC); r.style.setProperty('--tk-op', state.tkOp);
       document.getElementById('ticker-bg').style.background = getGrad(state.tkStyle, state.tkC1, state.tkC2);
       
       r.style.setProperty('--br-w', state.brW+'px'); r.style.setProperty('--br-op', state.brOp); r.style.setProperty('--br-style', getGrad(state.brStyle, state.brC1, state.brC2));
@@ -916,6 +911,7 @@
         document.getElementById('lss-vis').checked = state.lssVis; document.getElementById('lss-anim').checked = state.lssAnim; document.getElementById('lss-scale').value = state.lssScale; document.getElementById('lss-txt-c').value = state.lssTxtC; document.getElementById('lss-style').value = state.lssStyle; document.getElementById('lss-c1').value = state.lssC1; document.getElementById('lss-c2').value = state.lssC2;
         
         document.getElementById('tk-vis').checked = state.tkVis; document.getElementById('tk-scroll').checked = state.tkScroll; document.getElementById('tk-txt').value = state.tkTxt;
+        document.getElementById('tk-spd').value = state.tkSpd || 25;
         document.getElementById('ff-tk').value = state.ffTk; document.getElementById('tk-f').value = state.tkF; document.getElementById('tk-txt-c').value = state.tkTxtC; document.getElementById('tk-h').value = state.tkH; document.getElementById('tk-op').value = state.tkOp; document.getElementById('tk-style').value = state.tkStyle; document.getElementById('tk-c1').value = state.tkC1; document.getElementById('tk-c2').value = state.tkC2;
 
         document.getElementById('br-vis').checked = state.brVis; document.getElementById('br-w').value = state.brW; document.getElementById('br-op').value = state.brOp; document.getElementById('br-style').value = state.brStyle; document.getElementById('br-c1').value = state.brC1; document.getElementById('br-c2').value = state.brC2;
@@ -932,13 +928,11 @@
       document.getElementById('agl-wrapper').style.display = state.aglVis ? 'flex' : 'none';
       document.getElementById('agl-title-display').textContent = state.aglTitle;
       
-      // Vertical Agenda Mapping with Live Bulb, Up Next, and Completed
       document.getElementById('agl-list-render').innerHTML = state.agendaItems.map(i => {
         let pre = i.status === 'now' ? '<div class="ag-live-bulb"></div>' : '';
         let post = i.status === 'next' ? '<div class="ag-up-next">UP NEXT</div>' : (i.status === 'completed' ? '<div class="ag-completed">✔</div>' : '');
         return `<div class="agl-item status-${i.status}">${pre}<span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${i.text}</span>${post}</div>`;
       }).join('');
-      // Bind Right Anchor
       attachDraggable(document.getElementById('agl-wrapper'), (x, y) => { state.aglX = x; state.aglY = y; }, 'right');
 
       document.getElementById('clp-wrapper').style.display = state.clpVis ? 'flex' : 'none';
@@ -1168,7 +1162,6 @@
       const loaded = JSON.parse(JSON.stringify(savedLayouts[name]));
       const newState = { ...state };
       
-      // FIX: Added text fields (agR1Txt, aglTitle, tkTxt, etc.) so they update dynamically on layout load
       const styleKeys = [
         'agVis', 'agScale', 'ffAg', 'agR1Txt', 'agR1F', 'agR1C', 'agR1Style', 'agR1Bg1', 'agR1Bg2',
         'agR2Txt', 'agR2F', 'agR2C', 'agR2Style', 'agR2Bg1', 'agR2Bg2', 'agB2C', 'agB2Style', 'agB2Bg1', 'agB2Bg2',
@@ -1177,14 +1170,13 @@
         'clpVis', 'clpTitle', 'clpScale', 'clpFHd', 'clpFItem', 'clpTxtC', 'clpStyle', 'clpC1', 'clpC2', 'clpX', 'clpY',
         'ffL3', 'l3FName', 'l3FTitle', 
         'lssVis', 'lssScale', 'lssTxtC', 'lssStyle', 'lssC1', 'lssC2', 'lssX', 'lssY',
-        'tkVis', 'tkScroll', 'tkTxt', 'ffTk', 'tkF', 'tkTxtC', 'tkH', 'tkOp', 'tkStyle', 'tkC1', 'tkC2',
+        'tkVis', 'tkScroll', 'tkTxt', 'tkSpd', 'ffTk', 'tkF', 'tkTxtC', 'tkH', 'tkOp', 'tkStyle', 'tkC1', 'tkC2',
         'brVis', 'brW', 'brOp', 'brStyle', 'brC1', 'brC2',
         'tgtVis', 'tgtLike', 'tgtSub', 'tgtScale', 'ffTgtLbl', 'fTgtLbl', 'ffTgtVal', 'fTgtVal', 'tgtStyle', 'tgtC1', 'tgtC2'
       ];
       
       styleKeys.forEach(k => { if(loaded[k] !== undefined) newState[k] = loaded[k]; });
 
-      // Explicit Deep Copy of Arrays from Saved Layout
       if (loaded.nameplates) newState.nameplates = JSON.parse(JSON.stringify(loaded.nameplates));
       if (loaded.clpItems) newState.clpItems = JSON.parse(JSON.stringify(loaded.clpItems));
       if (loaded.clpGlobalHlC !== undefined) newState.clpGlobalHlC = loaded.clpGlobalHlC;
