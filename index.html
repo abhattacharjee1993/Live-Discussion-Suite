@@ -539,10 +539,19 @@
       fullRender(true); syncVisuals();
     }
 
+    // Capture state PRE-MUTATION for Undo/Redo support on inputs
     if(!isOverlay) {
-      document.getElementById('controls').addEventListener('change', (e) => {
-        if(e.target.tagName !== 'INPUT' && e.target.tagName !== 'SELECT') return;
-        saveHistory(); 
+      // For Text Inputs and Selects: Save history right before user starts changing them
+      document.getElementById('controls').addEventListener('focusin', (e) => {
+        if(['INPUT', 'SELECT'].includes(e.target.tagName)) {
+          saveHistory();
+        }
+      });
+      // For Checkboxes, Sliders, and Color Pickers: Save history on click if they aren't already focused
+      document.getElementById('controls').addEventListener('mousedown', (e) => {
+        if(['checkbox', 'range', 'color'].includes(e.target.type) && document.activeElement !== e.target) {
+          saveHistory();
+        }
       });
     }
 
@@ -572,6 +581,7 @@
       el.dataset.originX = originX;
       el.addEventListener('mousedown', (e) => {
         if(isOverlay || e.button !== 0) return;
+        saveHistory(); // Captured BEFORE dragging starts for Undo support
         isDraggingEl = { el, updateCallback };
         document.getElementById('drag-hint').style.display = 'block';
       });
@@ -601,7 +611,11 @@
 
     document.addEventListener('mouseup', () => {
       isDraggingPanel = false;
-      if(isDraggingEl) { saveHistory(); isDraggingEl = null; document.getElementById('drag-hint').style.display = 'none'; syncVisuals(); }
+      if(isDraggingEl) { 
+        isDraggingEl = null; 
+        document.getElementById('drag-hint').style.display = 'none'; 
+        syncVisuals(); 
+      }
     });
 
     // MASTER STATE (Using Percentage %)
@@ -1152,36 +1166,29 @@
       if(!isOverlay) document.getElementById('current-layout-badge').textContent = `Layout: ${name}`;
       
       const loaded = JSON.parse(JSON.stringify(savedLayouts[name]));
-      
       const newState = { ...state };
       
+      // FIX: Added text fields (agR1Txt, aglTitle, tkTxt, etc.) so they update dynamically on layout load
       const styleKeys = [
-        'agVis', 'agScale', 'ffAg', 'agR1F', 'agR1C', 'agR1Style', 'agR1Bg1', 'agR1Bg2',
-        'agR2F', 'agR2C', 'agR2Style', 'agR2Bg1', 'agR2Bg2', 'agB2C', 'agB2Style', 'agB2Bg1', 'agB2Bg2',
-        'agR3F', 'agR3C', 'agR3Style', 'agR3Bg1', 'agR3Bg2', 'agB3C', 'agB3Style', 'agB3Bg1', 'agB3Bg2',
-        'aglVis', 'aglScale', 'aglFHd', 'aglFItem', 'aglTxtC', 'aglStyle', 'aglC1', 'aglC2', 'aglX', 'aglY',
-        'clpVis', 'clpScale', 'clpFHd', 'clpFItem', 'clpTxtC', 'clpStyle', 'clpC1', 'clpC2', 'clpX', 'clpY',
+        'agVis', 'agScale', 'ffAg', 'agR1Txt', 'agR1F', 'agR1C', 'agR1Style', 'agR1Bg1', 'agR1Bg2',
+        'agR2Txt', 'agR2F', 'agR2C', 'agR2Style', 'agR2Bg1', 'agR2Bg2', 'agB2C', 'agB2Style', 'agB2Bg1', 'agB2Bg2',
+        'agR3Txt', 'agR3F', 'agR3C', 'agR3Style', 'agR3Bg1', 'agR3Bg2', 'agB3C', 'agB3Style', 'agB3Bg1', 'agB3Bg2',
+        'aglVis', 'aglTitle', 'aglScale', 'aglFHd', 'aglFItem', 'aglTxtC', 'aglStyle', 'aglC1', 'aglC2', 'aglX', 'aglY',
+        'clpVis', 'clpTitle', 'clpScale', 'clpFHd', 'clpFItem', 'clpTxtC', 'clpStyle', 'clpC1', 'clpC2', 'clpX', 'clpY',
         'ffL3', 'l3FName', 'l3FTitle', 
         'lssVis', 'lssScale', 'lssTxtC', 'lssStyle', 'lssC1', 'lssC2', 'lssX', 'lssY',
-        'tkVis', 'tkScroll', 'ffTk', 'tkF', 'tkTxtC', 'tkH', 'tkOp', 'tkStyle', 'tkC1', 'tkC2',
+        'tkVis', 'tkScroll', 'tkTxt', 'ffTk', 'tkF', 'tkTxtC', 'tkH', 'tkOp', 'tkStyle', 'tkC1', 'tkC2',
         'brVis', 'brW', 'brOp', 'brStyle', 'brC1', 'brC2',
-        'tgtVis', 'tgtScale', 'ffTgtLbl', 'fTgtLbl', 'ffTgtVal', 'fTgtVal', 'tgtStyle', 'tgtC1', 'tgtC2'
+        'tgtVis', 'tgtLike', 'tgtSub', 'tgtScale', 'ffTgtLbl', 'fTgtLbl', 'ffTgtVal', 'fTgtVal', 'tgtStyle', 'tgtC1', 'tgtC2'
       ];
       
       styleKeys.forEach(k => { if(loaded[k] !== undefined) newState[k] = loaded[k]; });
 
       // Explicit Deep Copy of Arrays from Saved Layout
-      if (loaded.nameplates) {
-        newState.nameplates = JSON.parse(JSON.stringify(loaded.nameplates));
-      }
-      if (loaded.clpItems) {
-        newState.clpItems = JSON.parse(JSON.stringify(loaded.clpItems));
-      }
-      if (loaded.clpTitle !== undefined) newState.clpTitle = loaded.clpTitle;
+      if (loaded.nameplates) newState.nameplates = JSON.parse(JSON.stringify(loaded.nameplates));
+      if (loaded.clpItems) newState.clpItems = JSON.parse(JSON.stringify(loaded.clpItems));
       if (loaded.clpGlobalHlC !== undefined) newState.clpGlobalHlC = loaded.clpGlobalHlC;
-      if (loaded.agendaItems) {
-        newState.agendaItems = JSON.parse(JSON.stringify(loaded.agendaItems));
-      }
+      if (loaded.agendaItems) newState.agendaItems = JSON.parse(JSON.stringify(loaded.agendaItems));
 
       state = newState;
       fullRender(true); closeModals();
